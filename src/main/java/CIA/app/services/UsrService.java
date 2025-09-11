@@ -21,7 +21,8 @@ public class UsrService {
 
     public Usr registUser(Usr user) {
         Usr existingUser = usrRepository.findByEmail(user.getEmail());
-        if (existingUser != null) {
+        Usr existingIdentification = usrRepository.findByIdentification(user.getIdentification());
+        if (existingUser != null || existingIdentification != null) {
             return null;
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -47,8 +48,9 @@ public class UsrService {
         Usr user = usrRepository.findByEmail(email);
         if (user != null) {
             usrRepository.delete(user);
+            return user;
         }
-        return user;
+        return null;
     }
 
     public Usr update(String currentEmail, Usr req) {

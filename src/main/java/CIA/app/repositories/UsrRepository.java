@@ -6,4 +6,5 @@ import CIA.app.model.Usr;
 
 public interface UsrRepository extends JpaRepository<Usr, Integer> {
     Usr findByEmail(String email);
+    Usr findByIdentification(String identification);
 }

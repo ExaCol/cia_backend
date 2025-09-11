@@ -92,7 +92,10 @@ public class UsrController {
         if (jwtUtil.isTokenValid(token, email)
                 && ("Cliente".equals(role) || "Admin".equals(role) || "Empleado".equals(role))) {
             try {
-                usrService.deleteByEmail(email);
+                Usr u =usrService.deleteByEmail(email);
+                if (u == null) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuario no encontrado");
+                }
                 return ResponseEntity.ok("Usuario eliminado correctamente");
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
