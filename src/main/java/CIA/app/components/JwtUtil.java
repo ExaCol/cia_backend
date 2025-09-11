@@ -24,12 +24,12 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setSubject(email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                //.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
 
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(SECRET_KEY)
                 .build()
@@ -56,8 +56,8 @@ public class JwtUtil {
                 .get("id", Integer.class);
     }
 
-    public boolean isTokenValid(String token, String username) {
-        return extractUsername(token).equals(username) && !isTokenExpired(token);
+    public boolean isTokenValid(String token, String email) {
+        return extractEmail(token).equals(email) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
