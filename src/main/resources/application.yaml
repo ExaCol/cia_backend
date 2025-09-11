@@ -1,19 +1,19 @@
 # Configuración de servidor
 server:
-  port: 8080  # Puerto en el que la aplicación escuchará las s
+  port: 8080  
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/CIAdb
+    url: jdbc:postgresql://localhost/CIAdb
     username: postgres
-    password: nico
+    password: Nacionalcampeon04.
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10  
   jpa:
     hibernate:
-      ddl-auto: update  # Generación automática de esquema de base de datos
-    show-sql: true  # Mostrar las consultas SQL en los logs
+      ddl-auto: update
+    show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     
 
