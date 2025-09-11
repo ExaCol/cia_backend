@@ -27,19 +27,19 @@ public class Vehicle {
     @Column
     private Integer id;
     @Column
-    private String tipo;
+    private String type;
+    @Column(unique = true)
+    private String plate;
     @Column
-    private String placa;
+    private String soatRateType;
     @Column
-    private String tipo_tarifa_soat;
-    @Column
-    private String clasificacion_tecno;
-    @Column
-    @Temporal(TemporalType.DATE)
-    private Date vencimiento_soat; 
+    private String technoClassification;
     @Column
     @Temporal(TemporalType.DATE)
-    private Date vencimiento_tecno; 
+    private Date soatExpiration; 
+    @Column
+    @Temporal(TemporalType.DATE)
+    private Date technoExpiration;
 
     @ManyToOne
     @JoinColumn(name = "usr_id")
@@ -54,52 +54,52 @@ public class Vehicle {
         this.id = id;
     }
 
-    public String getTipo() {
-        return tipo;
+    public String getType() {
+        return type;
     }
 
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public String getPlaca() {
-        return placa;
+    public String getPlate() {
+        return plate;
     }
 
-    public void setPlaca(String placa) {
-        this.placa = placa;
+    public void setPlate(String plate) {
+        this.plate = plate;
     }
 
-    public String getTipo_tarifa_soat() {
-        return tipo_tarifa_soat;
+    public String getSoatRateType() {
+        return soatRateType;
     }
 
-    public void setTipo_tarifa_soat(String tipo_tarifa_soat) {
-        this.tipo_tarifa_soat = tipo_tarifa_soat;
+    public void setSoatRateType(String soatRateType) {
+        this.soatRateType = soatRateType;
     }
 
-    public String getClasificacion_tecno() {
-        return clasificacion_tecno;
+    public String getTechnoClassification() {
+        return technoClassification;
     }
 
-    public void setClasificacion_tecno(String clasificacion_tecno) {
-        this.clasificacion_tecno = clasificacion_tecno;
+    public void setTechnoClassification(String technoClassification) {
+        this.technoClassification = technoClassification;
     }
 
-    public Date getVencimiento_soat() {
-        return vencimiento_soat;
+    public Date getSoatExpiration() {
+        return soatExpiration;
     }
 
-    public void setVencimiento_soat(Date vencimiento_soat) {
-        this.vencimiento_soat = vencimiento_soat;
+    public void setSoatExpiration(Date soatExpiration) {
+        this.soatExpiration = soatExpiration;
     }
 
-    public Date getVencimiento_tecno() {
-        return vencimiento_tecno;
+    public Date getTechnoExpiration() {
+        return technoExpiration;
     }
 
-    public void setVencimiento_tecno(Date vencimiento_tecno) {
-        this.vencimiento_tecno = vencimiento_tecno;
+    public void setTechnoExpiration(Date technoExpiration) {
+        this.technoExpiration = technoExpiration;
     }
 
     public Usr getUsr() {
@@ -109,6 +109,4 @@ public class Vehicle {
     public void setUsr(Usr usr) {
         this.usr = usr;
     }
-
-    
 }
