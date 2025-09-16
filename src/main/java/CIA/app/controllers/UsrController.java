@@ -70,7 +70,10 @@ public class UsrController {
             try {
                 Usr u = usrService.update(email, user);
                 if (u != null) {
-                    return ResponseEntity.ok("Usuario actualizado correctamente");
+                    String tokenG = jwtUtil.generateToken(u.getEmail(), u.getRole(), u.getId());
+                    HashMap<String, String> response = new HashMap<>();
+                    response.put("token", tokenG);
+                    return ResponseEntity.ok(response);
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El nuevo email ya está en uso");
                 }
@@ -92,7 +95,7 @@ public class UsrController {
         if (jwtUtil.isTokenValid(token, email)
                 && ("Cliente".equals(role) || "Admin".equals(role) || "Empleado".equals(role))) {
             try {
-                Usr u =usrService.deleteByEmail(email);
+                Usr u = usrService.deleteByEmail(email);
                 if (u == null) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuario no encontrado");
                 }

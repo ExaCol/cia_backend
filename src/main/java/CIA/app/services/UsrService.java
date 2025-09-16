@@ -55,14 +55,15 @@ public class UsrService {
 
     public Usr update(String currentEmail, Usr req) {
         Usr user = usrRepository.findByEmail(currentEmail);
-        if(user != null){
-            Usr comNemail = usrRepository.findByEmail(req.getEmail());
-            if(comNemail == null){
-                user.setEmail(req.getEmail());
-                user.setName(req.getName());
-                return usrRepository.save(user);
+        if (user != null) {
+            if (!currentEmail.equals(req.getEmail())) {
+                Usr comNemail = usrRepository.findByEmail(req.getEmail());
+                if (comNemail == null) {
+                    user.setEmail(req.getEmail());
+                }
             }
-            return null;
+            user.setName(req.getName());
+            return usrRepository.save(user);
         }
         return null;
     }
