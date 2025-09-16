@@ -12,8 +12,8 @@ public interface PaymentsRepository extends JpaRepository<Payments, Integer>{
 
     @Query("""
         select p
-        from Payment p
-        join p.service s
+        from Payments p
+        join p.services s
         where s.usr.id = :id
         """)
     List<Payments> getPaymentsByUser(@Param("id") Integer id);

@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import CIA.app.model.Usr;
 import CIA.app.model.Payments;
 import CIA.app.model.Services;
 import CIA.app.repositories.PaymentsRepository;
 
+@Service
 public class PaymentsService {
 
     @Autowired
