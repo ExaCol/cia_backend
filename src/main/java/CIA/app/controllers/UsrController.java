@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import CIA.app.components.JwtUtil;
 import CIA.app.components.LoginAttemptService;
+import CIA.app.dtos.ChangePassword;
 import CIA.app.model.Usr;
+import CIA.app.services.EmailService;
 import CIA.app.services.UsrService;
 
 @RestController
@@ -28,11 +30,15 @@ public class UsrController {
     private JwtUtil jwtUtil;
     @Autowired
     private LoginAttemptService loginAttemptService;
+    @Autowired
+    private EmailService emailService;
 
-    public UsrController(UsrService usrService, JwtUtil jwtUtil, LoginAttemptService loginAttemptService) {
+    public UsrController(UsrService usrService, JwtUtil jwtUtil, LoginAttemptService loginAttemptService,
+            EmailService emailService) {
         this.usrService = usrService;
         this.jwtUtil = jwtUtil;
         this.loginAttemptService = loginAttemptService;
+        this.emailService = emailService;
     }
 
     @PostMapping("/register")
@@ -70,7 +76,10 @@ public class UsrController {
             try {
                 Usr u = usrService.update(email, user);
                 if (u != null) {
-                    return ResponseEntity.ok("Usuario actualizado correctamente");
+                    String tokenG = jwtUtil.generateToken(u.getEmail(), u.getRole(), u.getId());
+                    HashMap<String, String> response = new HashMap<>();
+                    response.put("token", tokenG);
+                    return ResponseEntity.ok(response);
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El nuevo email ya está en uso");
                 }
@@ -92,7 +101,7 @@ public class UsrController {
         if (jwtUtil.isTokenValid(token, email)
                 && ("Cliente".equals(role) || "Admin".equals(role) || "Empleado".equals(role))) {
             try {
-                Usr u =usrService.deleteByEmail(email);
+                Usr u = usrService.deleteByEmail(email);
                 if (u == null) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuario no encontrado");
                 }
@@ -111,11 +120,19 @@ public class UsrController {
         Usr existingUser = usrService.findByEmail(user.getEmail());
         if (existingUser != null) {
             Usr u = usrService.login(user.getEmail(), user.getPassword());
+            if (loginAttemptService.isBlocked(user.getEmail())) {
+                String mensajeCorreo = "Hola, " + user.getName() + ".\n\n"
+                        + "Tu cuenta ha sido temporalmente bloqueada por 15 minutos debido a múltiples intentos fallidos de inicio de sesión.\n\n"
+                        + "Por tu seguridad, no podrás acceder durante este período. Pasado el tiempo de bloqueo, podrás intentar nuevamente. "
+                        + "Si olvidaste tu contraseña, utiliza la opción \"Olvidé mi contraseña\" para restablecerla.\n\n"
+                        + "Si no reconoces esta actividad, te recomendamos cambiar tu contraseña.\n\n"
+                        + "Saludos,\n"
+                        + "El equipo de SmartTraffic.";
+                emailService.enviarCorreo(user.getEmail(), "Cuenta bloqueada", mensajeCorreo);
+                return ResponseEntity.status(HttpStatus.LOCKED)
+                        .body("Usuario bloqueado por demasiados intentos fallidos");
+            }
             if (u != null) {
-                if (loginAttemptService.isBlocked(u.getEmail())) {
-                    return ResponseEntity.status(HttpStatus.LOCKED)
-                            .body("Usuario bloqueado por demasiados intentos fallidos");
-                }
                 loginAttemptService.loginSecceeded(u.getEmail());
                 String token = jwtUtil.generateToken(u.getEmail(), u.getRole(), u.getId());
                 HashMap<String, String> response = new HashMap<>();
@@ -127,6 +144,42 @@ public class UsrController {
             }
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+    }
+
+    @PatchMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody Usr usr) {
+        Usr u = usrService.changePassword(usr);
+        if (u != null) {
+            return ResponseEntity.ok("Contraseña actualizada correctamente");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al actualizar la contraseña");
+        }
+    }
+
+     @PatchMapping("/update-password")
+    public ResponseEntity<?> updatePassword(@RequestHeader("Authorization") String authHeader, @RequestBody ChangePassword changePassword) {
+        String token = authHeader.replace("Bearer ", "");
+        String email = jwtUtil.extractEmail(token);
+        String role = jwtUtil.extractUserRole(token);
+
+        if (jwtUtil.isTokenValid(token, email)
+                && ("Cliente".equals(role) || "Admin".equals(role) || "Empleado".equals(role))) {
+            try {
+                Usr existingUser = usrService.login(email, changePassword.getPasswordCurrent());
+                if (existingUser != null) {
+                    Usr updatedUser = usrService.updatePassword(email, changePassword.getPasswordCurrent(), changePassword.getPasswordNew());
+                    if (updatedUser != null) {
+                        return ResponseEntity.ok("Contraseña cambiada correctamente");
+                    }
+                }
+                return ResponseEntity.badRequest().body("La contraseña actual es incorrecta");
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Error al cambiar contraseña de usuario: " + e.getMessage());
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
         }
     }
 }
