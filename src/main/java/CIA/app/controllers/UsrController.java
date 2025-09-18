@@ -121,7 +121,8 @@ public class UsrController {
         if (existingUser != null) {
             Usr u = usrService.login(user.getEmail(), user.getPassword());
             if (loginAttemptService.isBlocked(user.getEmail())) {
-                String mensajeCorreo = "Hola, " + user.getName() + ".\n\n"
+                String name = usrService.findByEmail(user.getEmail()).getName();
+                String mensajeCorreo = "Hola, " + name + ".\n\n"
                         + "Tu cuenta ha sido temporalmente bloqueada por 15 minutos debido a múltiples intentos fallidos de inicio de sesión.\n\n"
                         + "Por tu seguridad, no podrás acceder durante este período. Pasado el tiempo de bloqueo, podrás intentar nuevamente. "
                         + "Si olvidaste tu contraseña, utiliza la opción \"Olvidé mi contraseña\" para restablecerla.\n\n"
