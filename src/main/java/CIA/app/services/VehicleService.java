@@ -15,11 +15,12 @@ public class VehicleService {
     private VehicleRepository vehicleRepository;
     @Autowired
     private UsrService usrService;
-
-    public VehicleService(VehicleRepository vehicleRepository) {
-        this.vehicleRepository = vehicleRepository;
-    }
     
+    public VehicleService(VehicleRepository vehicleRepository, UsrService usrService) {
+        this.vehicleRepository = vehicleRepository;
+        this.usrService = usrService;
+    }
+
     public Vehicle saveVehicle(String email, Vehicle vehicle) {
         Vehicle existingVehicle = vehicleRepository.findByPlate(vehicle.getPlate());
         if (existingVehicle != null) {
