@@ -138,6 +138,7 @@ public class UsrController {
                 String token = jwtUtil.generateToken(u.getEmail(), u.getRole(), u.getId());
                 HashMap<String, String> response = new HashMap<>();
                 response.put("token", token);
+                response.put("role", u.getRole());
                 return ResponseEntity.ok(response);
             } else {
                 loginAttemptService.loginFailed(user.getEmail());
