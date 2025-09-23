@@ -61,7 +61,7 @@ public class Services {
     private LocalDate start_Date;
 
     @Column
-    private boolean graduated;
+    private Boolean graduated;
 
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "service-partner")
