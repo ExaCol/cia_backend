@@ -20,6 +20,7 @@ import CIA.app.dtos.ChangePassword;
 import CIA.app.model.Usr;
 import CIA.app.services.EmailService;
 import CIA.app.services.UsrService;
+import io.jsonwebtoken.ExpiredJwtException;
 
 @RestController
 @RequestMapping("/usr")
@@ -54,64 +55,76 @@ public class UsrController {
     @GetMapping("/user")
     public ResponseEntity<?> userEndpoint(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
-        String email = jwtUtil.extractEmail(token);
-        String role = jwtUtil.extractUserRole(token);
+        try {
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
 
-        if (jwtUtil.isTokenValid(token, email)
-                && ("Cliente".equals(role) || "Admin".equals(role) || "Empleado".equals(role))) {
-            return ResponseEntity.ok(usrService.findByEmail(email));
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol USER");
+            if (jwtUtil.isTokenValid(token, email)
+                    && ("Cliente".equals(role) || "Admin".equals(role) || "Empleado".equals(role))) {
+                return ResponseEntity.ok(usrService.findByEmail(email));
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+            }
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
         }
     }
 
     @PatchMapping("/user")
     public ResponseEntity<?> updateUser(@RequestHeader("Authorization") String authHeader, @RequestBody Usr user) {
         String token = authHeader.replace("Bearer ", "");
-        String email = jwtUtil.extractEmail(token);
-        String role = jwtUtil.extractUserRole(token);
+        try {
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
 
-        if (jwtUtil.isTokenValid(token, email)
-                && ("Cliente".equals(role) || "Admin".equals(role) || "Empleado".equals(role))) {
-            try {
-                Usr u = usrService.update(email, user);
-                if (u != null) {
-                    String tokenG = jwtUtil.generateToken(u.getEmail(), u.getRole(), u.getId());
-                    HashMap<String, String> response = new HashMap<>();
-                    response.put("token", tokenG);
-                    return ResponseEntity.ok(response);
-                } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El nuevo email ya está en uso");
+            if (jwtUtil.isTokenValid(token, email)
+                    && ("Cliente".equals(role) || "Admin".equals(role) || "Empleado".equals(role))) {
+                try {
+                    Usr u = usrService.update(email, user);
+                    if (u != null) {
+                        String tokenG = jwtUtil.generateToken(u.getEmail(), u.getRole(), u.getId());
+                        HashMap<String, String> response = new HashMap<>();
+                        response.put("token", tokenG);
+                        return ResponseEntity.ok(response);
+                    } else {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El nuevo email ya está en uso");
+                    }
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Error al actualizar usuario: " + e.getMessage());
                 }
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Error al actualizar usuario: " + e.getMessage());
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
         }
     }
 
     @DeleteMapping("/user")
     public ResponseEntity<?> deleteUser(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
-        String email = jwtUtil.extractEmail(token);
-        String role = jwtUtil.extractUserRole(token);
+        try {
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
 
-        if (jwtUtil.isTokenValid(token, email)
-                && ("Cliente".equals(role) || "Admin".equals(role) || "Empleado".equals(role))) {
-            try {
-                Usr u = usrService.deleteByEmail(email);
-                if (u == null) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuario no encontrado");
+            if (jwtUtil.isTokenValid(token, email)
+                    && ("Cliente".equals(role) || "Admin".equals(role) || "Empleado".equals(role))) {
+                try {
+                    Usr u = usrService.deleteByEmail(email);
+                    if (u == null) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuario no encontrado");
+                    }
+                    return ResponseEntity.ok("Usuario eliminado correctamente");
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Error al eliminar usuario: " + e.getMessage());
                 }
-                return ResponseEntity.ok("Usuario eliminado correctamente");
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Error al eliminar usuario: " + e.getMessage());
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
         }
     }
 
@@ -159,29 +172,35 @@ public class UsrController {
         }
     }
 
-     @PatchMapping("/update-password")
-    public ResponseEntity<?> updatePassword(@RequestHeader("Authorization") String authHeader, @RequestBody ChangePassword changePassword) {
+    @PatchMapping("/update-password")
+    public ResponseEntity<?> updatePassword(@RequestHeader("Authorization") String authHeader,
+            @RequestBody ChangePassword changePassword) {
         String token = authHeader.replace("Bearer ", "");
-        String email = jwtUtil.extractEmail(token);
-        String role = jwtUtil.extractUserRole(token);
+        try {
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
 
-        if (jwtUtil.isTokenValid(token, email)
-                && ("Cliente".equals(role) || "Admin".equals(role) || "Empleado".equals(role))) {
-            try {
-                Usr existingUser = usrService.login(email, changePassword.getPasswordCurrent());
-                if (existingUser != null) {
-                    Usr updatedUser = usrService.updatePassword(email, changePassword.getPasswordCurrent(), changePassword.getPasswordNew());
-                    if (updatedUser != null) {
-                        return ResponseEntity.ok("Contraseña cambiada correctamente");
+            if (jwtUtil.isTokenValid(token, email)
+                    && ("Cliente".equals(role) || "Admin".equals(role) || "Empleado".equals(role))) {
+                try {
+                    Usr existingUser = usrService.login(email, changePassword.getPasswordCurrent());
+                    if (existingUser != null) {
+                        Usr updatedUser = usrService.updatePassword(email, changePassword.getPasswordCurrent(),
+                                changePassword.getPasswordNew());
+                        if (updatedUser != null) {
+                            return ResponseEntity.ok("Contraseña cambiada correctamente");
+                        }
                     }
+                    return ResponseEntity.badRequest().body("La contraseña actual es incorrecta");
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Error al cambiar contraseña de usuario: " + e.getMessage());
                 }
-                return ResponseEntity.badRequest().body("La contraseña actual es incorrecta");
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Error al cambiar contraseña de usuario: " + e.getMessage());
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
         }
     }
 }
