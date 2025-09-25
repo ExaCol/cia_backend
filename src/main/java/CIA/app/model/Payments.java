@@ -30,7 +30,8 @@ public class Payments {
     private Integer id;
 
     @Column
-    private LocalDate release_date;
+    private LocalDate releaseDate;
+
 
     @Column
     private int amount;
@@ -50,12 +51,14 @@ public class Payments {
         this.id = id;
     }
 
-    public LocalDate getRelease_date() {
-        return release_date;
+
+    public LocalDate getreleaseDate() {
+        return releaseDate;
     }
 
-    public void setRelease_date(LocalDate release_date) {
-        this.release_date = release_date;
+    public void setreleaseDate(LocalDate releaseDate) {
+        this.releaseDate = releaseDate;
+
     }
 
     public int getAmount() {

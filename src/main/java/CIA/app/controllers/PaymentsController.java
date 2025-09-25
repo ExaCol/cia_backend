@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-//import org.springframework.web.bind.annotation.PathVariable;
+
+import org.springframework.web.bind.annotation.PathVariable;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -17,6 +19,9 @@ import CIA.app.components.JwtUtil;
 import CIA.app.model.Payments;
 import CIA.app.model.Services;
 import CIA.app.services.PaymentsService;
+import io.jsonwebtoken.ExpiredJwtException;
+
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/payments")
@@ -32,14 +37,16 @@ public class PaymentsController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createPayments(@RequestHeader("Authorization") String authHeader, @RequestBody Payments payments, @RequestBody List<Services> services) {
+    public ResponseEntity<?> createPayments(@RequestHeader("Authorization") String authHeader, @RequestBody Payments payments) {
         String token = authHeader.replace("Bearer ", "");
+        try{
+
         String email = jwtUtil.extractEmail(token);
         String role = jwtUtil.extractUserRole(token);
 
         if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role) ) {
             try {
-                Payments p = paymentsService.createPayments(email, payments, services);
+                Payments p = paymentsService.createPayments(email, payments);
                     if (p == null) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El usuario o servicio no existe");
                     }
@@ -50,12 +57,44 @@ public class PaymentsController {
             }
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+
+        }}catch(ExpiredJwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado ");
+        }
+    }
+
+    @GetMapping("/paymentHistory")
+    public ResponseEntity<?> getPaymentHistory(@RequestHeader("Authorization") String authHeader){
+        String token = authHeader.replace("Bearer ", "");
+        try{
+        String email = jwtUtil.extractEmail(token);
+        String role = jwtUtil.extractUserRole(token);
+
+        if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role) ) {
+            try {
+                paymentsService.getPaymentHistoryByUserId(email);
+                 List<Payments> p = paymentsService.getPaymentHistoryByUserId(email);
+                if ( p== null) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se han realizado pagos");
+                }
+                return ResponseEntity.ok(p);
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Error al obtener el pago: " + e.getMessage());
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+        }}catch(ExpiredJwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado ");
         }
     }
 
     @GetMapping("/byUser")
     public ResponseEntity<?> getByUser(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
+
+        try{
+
         String email = jwtUtil.extractEmail(token);
         String role = jwtUtil.extractUserRole(token);
 
@@ -72,18 +111,24 @@ public class PaymentsController {
             }
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+
+        }}catch(ExpiredJwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado ");
         }
     }
 
-    @GetMapping("/specificPayments")
-    public ResponseEntity<?> getPayment(@RequestHeader("Authorization") String authHeader, @RequestBody Payments payments) {
+    @GetMapping("/specificPayments/{paymentId}")
+    public ResponseEntity<?> getPayment(@RequestHeader("Authorization") String authHeader, @PathVariable Integer paymentId) {
         String token = authHeader.replace("Bearer ", "");
+        try{
         String email = jwtUtil.extractEmail(token);
         String role = jwtUtil.extractUserRole(token);
 
         if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role) ) {
             try {
-                Payments p = paymentsService.getSpecificPayments(payments);
+
+                Payments p = paymentsService.getSpecificPayments(paymentId);
+
                 if (p == null) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se ha encontrado el pago");
                 }
@@ -94,12 +139,18 @@ public class PaymentsController {
             }
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+
+        }}catch(ExpiredJwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado ");
+
         }
     }
 
     @DeleteMapping("/specificPayment")
     public ResponseEntity<?> deleteSpecificPayment(@RequestHeader("Authorization") String authHeader, @RequestBody Payments payments) {
         String token = authHeader.replace("Bearer ", "");
+        try{
+
         String email = jwtUtil.extractEmail(token);
         String role = jwtUtil.extractUserRole(token);
 
@@ -116,6 +167,10 @@ public class PaymentsController {
             }
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+
+        }}catch(ExpiredJwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado ");
         }
     }
 }
+
