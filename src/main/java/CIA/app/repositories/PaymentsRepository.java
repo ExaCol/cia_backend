@@ -2,7 +2,6 @@ package CIA.app.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-
 import java.time.LocalDate;
 
 import java.util.List;
@@ -70,7 +69,5 @@ Double earningsByCat(@Param("type") String type);
     AND s.graduated = true
         """)
 Integer graduatedUsr();
-
-
 
 }

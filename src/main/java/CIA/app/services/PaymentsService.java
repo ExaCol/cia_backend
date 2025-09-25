@@ -1,6 +1,5 @@
 package CIA.app.services;
 
-
 import java.time.LocalDate;
 
 import java.util.List;
@@ -16,8 +15,6 @@ import CIA.app.repositories.PaymentsRepository;
 
 import CIA.app.repositories.ServicesRepository;
 
-
-
 @Service
 public class PaymentsService {
 
@@ -25,7 +22,7 @@ public class PaymentsService {
     private PaymentsRepository paymentsRepository;
     @Autowired
     private UsrService usrService;
-
+  
     @Autowired 
     ServicesRepository servicesRepository;
 
@@ -52,9 +49,7 @@ public class PaymentsService {
             for(Services s: existing){
                 s.setPayment(payment);
             }
-
             payment.setServices(existing);
-
             return paymentsRepository.save(payment);
         }
         return null;
@@ -68,7 +63,6 @@ public class PaymentsService {
         return null;
     }
 
-
     public Payments getSpecificPayments(Integer paymentId){
         Optional<Payments> p = paymentsRepository.findById(paymentId);
 
@@ -78,7 +72,6 @@ public class PaymentsService {
     public Payments deleteEspecificPayments(Payments payment){
 
         Payments p = getSpecificPayments(payment.getId());
-
         if(p != null){
             paymentsRepository.delete(p);
             return p;
@@ -86,7 +79,6 @@ public class PaymentsService {
 
         return null;
     }
-
 
     public List<Payments> getPaymentHistoryByUserId(String email){
         Usr usr = usrService.findByEmail(email);
