@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import CIA.app.components.JwtUtil;
 import CIA.app.model.Payments;
+
 import CIA.app.model.Services;
 import CIA.app.services.PaymentsService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -119,6 +121,7 @@ public class PaymentsController {
     public ResponseEntity<?> getPayment(@RequestHeader("Authorization") String authHeader, @PathVariable Integer paymentId) {
         String token = authHeader.replace("Bearer ", "");
         try{
+
         String email = jwtUtil.extractEmail(token);
         String role = jwtUtil.extractUserRole(token);
 

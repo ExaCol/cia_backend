@@ -2,20 +2,30 @@ package CIA.app.controllers;
 
 import java.util.HashMap;
 
+import java.util.List;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+//import org.springframework.web.bind.annotation.PathVariable;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.springframework.web.bind.annotation.RequestParam;
+
 import org.springframework.web.bind.annotation.RestController;
 
 import CIA.app.components.JwtUtil;
 import CIA.app.components.LoginAttemptService;
+import CIA.app.model.Partner;
+
 import CIA.app.dtos.ChangePassword;
 import CIA.app.model.Usr;
 import CIA.app.services.EmailService;
@@ -32,6 +42,7 @@ public class UsrController {
     private JwtUtil jwtUtil;
     @Autowired
     private LoginAttemptService loginAttemptService;
+
     @Autowired
     private EmailService emailService;
 
@@ -56,6 +67,7 @@ public class UsrController {
     @GetMapping("/user")
     public ResponseEntity<?> userEndpoint(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
+
         try {
             String email = jwtUtil.extractEmail(token);
             String role = jwtUtil.extractUserRole(token);
@@ -152,6 +164,7 @@ public class UsrController {
                 String token = jwtUtil.generateToken(u.getEmail(), u.getRole(), u.getId());
                 HashMap<String, String> response = new HashMap<>();
                 response.put("token", token);
+
                 response.put("role", u.getRole());
                 return ResponseEntity.ok(response);
             } else {
@@ -162,6 +175,25 @@ public class UsrController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
         }
     }
+
+
+    @GetMapping("/nearestPartner")
+    public ResponseEntity<?> getPayment(@RequestHeader("Authorization") String authHeader, @RequestParam String type, @RequestParam double maxDistance) {
+        String token = authHeader.replace("Bearer ", "");
+        try{
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
+
+            if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role) ) {
+                try {
+                    List<Partner> p = usrService.getNearestPartner(email, type, maxDistance * 1000);
+                    if (p == null || p.isEmpty()) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se han encontrado aliados con la distancia ingresada");
+                    }
+                    return ResponseEntity.ok(p);
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Error al obtener lista de aliados: " + e.getMessage());
 
     @PatchMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody Usr usr) {
@@ -196,6 +228,7 @@ public class UsrController {
                 } catch (Exception e) {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                             .body("Error al cambiar contraseña de usuario: " + e.getMessage());
+
                 }
             } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
@@ -204,4 +237,5 @@ public class UsrController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
         }
     }
+
 }

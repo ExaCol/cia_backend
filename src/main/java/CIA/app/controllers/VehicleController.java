@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import CIA.app.components.JwtUtil;
 import CIA.app.model.Vehicle;
 import CIA.app.services.VehicleService;
+
 import io.jsonwebtoken.ExpiredJwtException;
 
 
@@ -33,6 +34,7 @@ public class VehicleController {
     }
 
     @PostMapping("/save")
+
     public ResponseEntity<?> saveVehicle(@RequestHeader("Authorization") String authHeader,
             @RequestBody Vehicle vehicle) {
         String token = authHeader.replace("Bearer ", "");
@@ -63,6 +65,7 @@ public class VehicleController {
     @GetMapping("/byPlate/{plate}")
     public ResponseEntity<?> getByPlate(@RequestHeader("Authorization") String authHeader, @PathVariable String plate) {
         String token = authHeader.replace("Bearer ", "");
+
         try {
             String email = jwtUtil.extractEmail(token);
             String role = jwtUtil.extractUserRole(token);
@@ -89,6 +92,7 @@ public class VehicleController {
     @GetMapping("/vehicles")
     public ResponseEntity<?> getVehicles(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
+
         try {
             String email = jwtUtil.extractEmail(token);
             String role = jwtUtil.extractUserRole(token);
@@ -109,6 +113,7 @@ public class VehicleController {
             }
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
+
         }
     }
 

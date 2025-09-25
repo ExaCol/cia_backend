@@ -12,7 +12,6 @@ import CIA.app.model.Usr;
 import CIA.app.model.Payments;
 import CIA.app.model.Services;
 import CIA.app.repositories.PaymentsRepository;
-
 import CIA.app.repositories.ServicesRepository;
 
 @Service
@@ -22,9 +21,8 @@ public class PaymentsService {
     private PaymentsRepository paymentsRepository;
     @Autowired
     private UsrService usrService;
-  
     @Autowired 
-    ServicesRepository servicesRepository;
+    private ServicesRepository servicesRepository;
 
     public PaymentsService(PaymentsRepository paymentsRepository, UsrService usrService, ServicesRepository servicesRepository) {
         this.paymentsRepository = paymentsRepository;
@@ -43,7 +41,7 @@ public class PaymentsService {
 
             List<Services> existing = servicesRepository.findAllById(ids);
             if (existing.size() != ids.size()) {
-                throw new IllegalArgumentException("Ingrese servicios vÃ¡lidos");
+                throw new IllegalArgumentException("Ingrese servicios válidos");
             }
 
             for(Services s: existing){
@@ -65,7 +63,6 @@ public class PaymentsService {
 
     public Payments getSpecificPayments(Integer paymentId){
         Optional<Payments> p = paymentsRepository.findById(paymentId);
-
         return p.orElse(null);
     }
 

@@ -42,7 +42,7 @@ public class Services {
     @Column
     private int price;
 
-    @Column
+    @Column(name = "service_type")
     private String serviceType;
 
     @Column
@@ -62,7 +62,6 @@ public class Services {
 
     @Column
     private Boolean graduated;
-
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "service-partner")
     private List<Partner> partner;
@@ -88,7 +87,7 @@ public class Services {
         return price;
     }
 
-    public String getserviceType() {
+    public String getServiceType() {
         return serviceType;
     }
 
@@ -131,7 +130,8 @@ public class Services {
     public void setPrice(int price) {
         this.price = price;
     }
-    public void setserviceType(String serviceType) {
+
+    public void setServiceType(String serviceType) {
         this.serviceType = serviceType;
     }
 
@@ -174,4 +174,5 @@ public class Services {
     public void setGraduated(boolean graduated) {
         this.graduated = graduated;
     }
+
 }
