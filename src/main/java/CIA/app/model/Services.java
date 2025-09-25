@@ -60,6 +60,8 @@ public class Services {
     @Column
     private LocalDate start_Date;
 
+    @Column
+    private Boolean graduated;
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "service-partner")
     private List<Partner> partner;
@@ -164,7 +166,13 @@ public class Services {
     public void setPayment(Payments payment) {
         this.payment = payment;
     }
+  
+    public boolean isGraduated() {
+        return graduated;
+    }
 
-    
-    
+    public void setGraduated(boolean graduated) {
+        this.graduated = graduated;
+    }
+
 }

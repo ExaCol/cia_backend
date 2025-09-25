@@ -42,7 +42,6 @@ public class PartnerService {
             if (!partnerId.equals(existing.getId())){
                 throw new IllegalArgumentException("Ingrese un servicio válido");
             }
-
             partner.setService(existing);
             return partnerRepository.save(partner);
         }

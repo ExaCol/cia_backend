@@ -1,5 +1,7 @@
 package CIA.app.services;
 
+import java.time.LocalDate;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -20,7 +22,7 @@ public class PaymentsService {
     @Autowired
     private UsrService usrService;
     @Autowired 
-    ServicesRepository servicesRepository;
+    private ServicesRepository servicesRepository;
 
     public PaymentsService(PaymentsRepository paymentsRepository, UsrService usrService, ServicesRepository servicesRepository) {
         this.paymentsRepository = paymentsRepository;
@@ -45,7 +47,6 @@ public class PaymentsService {
             for(Services s: existing){
                 s.setPayment(payment);
             }
-
             payment.setServices(existing);
             return paymentsRepository.save(payment);
         }
@@ -76,5 +77,34 @@ public class PaymentsService {
         return null;
     }
 
+    public List<Payments> getPaymentHistoryByUserId(String email){
+        Usr usr = usrService.findByEmail(email);
+        if(usr != null){
+            return paymentsRepository.findAllByUserServicesOrderByReleaseDateDesc(usr.getId());
+        }
+        return List.of();
+    }
 
+
+    public int getPaymentNumber(LocalDate startDate, LocalDate endDate){
+        return paymentsRepository.findPaymentsNumBetweenDates(startDate, endDate);
+
+    }
+
+    public Double earningsByCat(String type){
+        return paymentsRepository.earningsByCat(type);
+    }
+
+    public Double getNetWorth(){
+        return paymentsRepository.findTotalPaymentsAmount();
+    }
+
+    public Double savedUsrMoney(){
+        return paymentsRepository.savedUsrMoney("SIMIT");
+    }
+
+    public Integer graduatedNum(){
+        return paymentsRepository.graduatedUsr();
+    }
 }
+

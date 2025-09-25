@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+
 //import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +36,7 @@ public class ServicesController {
     @PostMapping("/create")
     public ResponseEntity<?> createServices(@RequestHeader("Authorization") String authHeader, @RequestBody Services services) {
         String token = authHeader.replace("Bearer ", "");
+
         try {
             String email = jwtUtil.extractEmail(token);
             String role = jwtUtil.extractUserRole(token);
@@ -63,6 +64,7 @@ public class ServicesController {
     @GetMapping("/byUser")
     public ResponseEntity<?> getByUser(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
+
         try{
             String email = jwtUtil.extractEmail(token);
             String role = jwtUtil.extractUserRole(token);
@@ -109,6 +111,7 @@ public class ServicesController {
             }
         }catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
+
         }
     }
 
@@ -135,6 +138,7 @@ public class ServicesController {
             }
         }catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
+
         }
     }
 }

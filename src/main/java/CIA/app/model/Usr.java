@@ -38,6 +38,7 @@ public class Usr {
     private Double lon;
     @Column
     private Double lat;
+
     @OneToMany(mappedBy = "usr", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value="usr-vehicle")
     private List<Vehicle> vehicles;
@@ -78,6 +79,7 @@ public class Usr {
     public void setRole(String role) {
         this.role = role;
     }
+
     public Double getLon() {
         return lon;
     }

@@ -1,9 +1,11 @@
 package CIA.app.services;
 
+
 //import java.util.Collections;
 //import java.util.HashMap;
 import java.util.List;
 //import java.util.Map;
+
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import CIA.app.model.Usr;
 import CIA.app.model.Services;
 import CIA.app.repositories.ServicesRepository;
 import CIA.app.repositories.UsrRepository;
+
 
 @Service
 public class ServicesService {
@@ -39,6 +42,7 @@ public class ServicesService {
 
     public List<Services> getServicesByUser(String email){
         Usr user = usrRepository.findByEmail(email);
+
         if (user != null) {
             return servicesRepository.getServicesByUser(user.getId());
         }
@@ -81,6 +85,7 @@ public class ServicesService {
     //     }
     //     return Collections.emptyMap();
     // }
+
 
     
 }

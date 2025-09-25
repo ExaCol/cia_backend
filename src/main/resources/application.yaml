@@ -6,7 +6,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost/CIAdb
     username: postgres
-    password: guntersitoSQL
+    password: 
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10  
@@ -15,5 +15,19 @@ spring:
       ddl-auto: update
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: felipetrivinogarzon@gmail.com
+    password: bccs bcmf vvmk gooc
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 60000  
+          timeout: 60000              
+          writetimeout: 60000    
     
 

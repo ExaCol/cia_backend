@@ -24,5 +24,4 @@ public interface ServicesRepository extends JpaRepository<Services, Integer>{
            """)
     List<Services> getServicesByType(@Param("type") String type);
 
-
 }
