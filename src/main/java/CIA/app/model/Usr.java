@@ -35,9 +35,9 @@ public class Usr {
     @Column
     private String role;
     @Column
-    private Long lon;
+    private Double lon;
     @Column
-    private Long lat;
+    private Double lat;
     @OneToMany(mappedBy = "usr", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value="usr-vehicle")
     private List<Vehicle> vehicles;
@@ -78,16 +78,16 @@ public class Usr {
     public void setRole(String role) {
         this.role = role;
     }
-    public Long getLon() {
+    public Double getLon() {
         return lon;
     }
-    public void setLon(Long lon) {
+    public void setLon(Double lon) {
         this.lon = lon;
     }
-    public Long getLat() {
+    public Double getLat() {
         return lat;
     }
-    public void setLat(Long lat) {
+    public void setLat(Double lat) {
         this.lat = lat;
     }
     public List<Vehicle> getVehicles() {

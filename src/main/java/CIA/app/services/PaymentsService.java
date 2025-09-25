@@ -10,6 +10,7 @@ import CIA.app.model.Usr;
 import CIA.app.model.Payments;
 import CIA.app.model.Services;
 import CIA.app.repositories.PaymentsRepository;
+import CIA.app.repositories.ServicesRepository;
 
 @Service
 public class PaymentsService {
@@ -18,15 +19,34 @@ public class PaymentsService {
     private PaymentsRepository paymentsRepository;
     @Autowired
     private UsrService usrService;
+    @Autowired 
+    ServicesRepository servicesRepository;
 
-    public PaymentsService(PaymentsRepository paymentsRepository) {
+    public PaymentsService(PaymentsRepository paymentsRepository, UsrService usrService, ServicesRepository servicesRepository) {
         this.paymentsRepository = paymentsRepository;
+        this.usrService = usrService;
+        this.servicesRepository = servicesRepository;
     }
     
-    public Payments createPayments(String email, Payments payment, List<Services> services) {
+    public Payments createPayments(String email, Payments payment) {
         Usr user = usrService.findByEmail(email);
         if (user != null) {
-            payment.setServices(services);
+            
+            List<Integer> ids = payment.getServices().stream().map(Services::getId).toList();
+            if (ids.isEmpty()) {
+                throw new IllegalArgumentException("Debe enviar un pago con servicio/s asociado/s");
+            }
+
+            List<Services> existing = servicesRepository.findAllById(ids);
+            if (existing.size() != ids.size()) {
+                throw new IllegalArgumentException("Ingrese servicios válidos");
+            }
+
+            for(Services s: existing){
+                s.setPayment(payment);
+            }
+
+            payment.setServices(existing);
             return paymentsRepository.save(payment);
         }
         return null;
@@ -40,14 +60,14 @@ public class PaymentsService {
         return null;
     }
 
-    public Payments getSpecificPayments(Payments payment){
-        Optional<Payments> p = paymentsRepository.findById(payment.getId());
+    public Payments getSpecificPayments(Integer paymentId){
+        Optional<Payments> p = paymentsRepository.findById(paymentId);
         return p.orElse(null);
     }
 
     public Payments deleteEspecificPayments(Payments payment){
 
-        Payments p = getSpecificPayments(payment);
+        Payments p = getSpecificPayments(payment.getId());
         if(p != null){
             paymentsRepository.delete(p);
             return p;

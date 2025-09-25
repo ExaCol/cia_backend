@@ -42,8 +42,8 @@ public class Services {
     @Column
     private int price;
 
-    @Column
-    private String service_type;
+    @Column(name = "service_type")
+    private String serviceType;
 
     @Column
     private String plate;
@@ -85,8 +85,8 @@ public class Services {
         return price;
     }
 
-    public String getService_type() {
-        return service_type;
+    public String getServiceType() {
+        return serviceType;
     }
 
     public String getPlate() {
@@ -129,8 +129,8 @@ public class Services {
         this.price = price;
     }
 
-    public void setService_type(String service_type) {
-        this.service_type = service_type;
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
     }
 
     public void setPlate(String plate) {

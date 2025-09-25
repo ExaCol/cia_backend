@@ -36,10 +36,10 @@ public class Partner {
     private String name;
 
     @Column
-    private Long lat;
+    private Double lat;
 
     @Column
-    private Long lon;
+    private Double lon;
 
     @Column
     private boolean soat;
@@ -68,19 +68,19 @@ public class Partner {
         this.name = name;
     }
 
-    public Long getLat() {
+    public Double getLat() {
         return lat;
     }
 
-    public void setLat(Long lat) {
+    public void setLat(Double lat) {
         this.lat = lat;
     }
 
-    public Long getLon() {
+    public Double getLon() {
         return lon;
     }
 
-    public void setLon(Long lon) {
+    public void setLon(Double lon) {
         this.lon = lon;
     }
 
