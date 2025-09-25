@@ -18,6 +18,7 @@ import CIA.app.model.Vehicle;
 import CIA.app.services.VehicleService;
 import io.jsonwebtoken.ExpiredJwtException;
 
+
 @RestController
 @RequestMapping("/vehicle")
 public class VehicleController {
