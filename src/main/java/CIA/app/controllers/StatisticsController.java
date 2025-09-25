@@ -45,6 +45,7 @@ public class StatisticsController {
     @GetMapping("/paymentNumber")
     public ResponseEntity<?> PaymentNumber(@RequestHeader("Authorization")String authHeader, @RequestParam("strtDate") String startDate, @RequestParam("endDate") String endDate){
         String token = authHeader.replace("Bearer ", "");
+        try{
         String email = jwtUtil.extractEmail(token);
         String role = jwtUtil.extractUserRole(token);
 
@@ -63,7 +64,9 @@ public class StatisticsController {
        }
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol ADMIN");
-        }  
+        }}catch(ExpiredJwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado ");
+        }
 
     }
     
@@ -72,6 +75,7 @@ public class StatisticsController {
     @GetMapping("/netWorth")
     public ResponseEntity<?> netWorth(@RequestHeader("Authorization")String authHeader){
         String token = authHeader.replace("Bearer ", "");
+        try{
         String email = jwtUtil.extractEmail(token);
         String role = jwtUtil.extractUserRole(token);
 
@@ -84,6 +88,8 @@ public class StatisticsController {
             }
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol ADMIN");
+        }}catch(ExpiredJwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado ");
         }
     }
     
@@ -91,6 +97,7 @@ public class StatisticsController {
     @GetMapping("/businessWorth")
     public ResponseEntity<?> businessWorth(@RequestHeader("Authorization")String authHeader){
         String token = authHeader.replace("Bearer ", "");
+        try{
         String email = jwtUtil.extractEmail(token);
         String role = jwtUtil.extractUserRole(token);
 
@@ -103,6 +110,8 @@ public class StatisticsController {
             }
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol ADMIN");
+        }}catch(ExpiredJwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado ");
         }
     }
 
@@ -111,6 +120,7 @@ public class StatisticsController {
     @GetMapping("/savedMoney")
     public ResponseEntity<?> savedMoney(@RequestHeader("Authorization")String authHeader){
         String token = authHeader.replace("Bearer ", "");
+        try{
         String email = jwtUtil.extractEmail(token);
         String role = jwtUtil.extractUserRole(token);
 
@@ -123,12 +133,15 @@ public class StatisticsController {
             }
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol ADMIN");
+        }}catch(ExpiredJwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado ");
         }
     }
     // ganancia por categoria de servicio
     @GetMapping("/earningsByCat")
     public ResponseEntity<?> earningsByCat(@RequestHeader("Authorization")String authHeader, @RequestParam("type") String type){
         String token = authHeader.replace("Bearer ", "");
+        try{
         String email = jwtUtil.extractEmail(token);
         String role = jwtUtil.extractUserRole(token);
 
@@ -141,6 +154,8 @@ public class StatisticsController {
             }
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol ADMIN");
+        }}catch(ExpiredJwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado ");
         }
         
     }
@@ -149,6 +164,7 @@ public class StatisticsController {
     @GetMapping("/graduatedUsr")
     public ResponseEntity<?> GraduatedUsr(@RequestHeader("Authorization")String authHeader){
         String token = authHeader.replace("Bearer ", "");
+        try{
         String email = jwtUtil.extractEmail(token);
         String role = jwtUtil.extractUserRole(token);
 
@@ -161,6 +177,8 @@ public class StatisticsController {
             }
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol ADMIN");
+        }}catch(ExpiredJwtException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado ");
         }
         
     }
