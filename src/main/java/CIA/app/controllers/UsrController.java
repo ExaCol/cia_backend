@@ -4,14 +4,12 @@ import java.util.HashMap;
 
 import java.util.List;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-//import org.springframework.web.bind.annotation.PathVariable;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,7 +29,6 @@ import CIA.app.model.Usr;
 import CIA.app.services.EmailService;
 import CIA.app.services.UsrService;
 import io.jsonwebtoken.ExpiredJwtException;
-
 
 @RestController
 @RequestMapping("/usr")
@@ -176,24 +173,33 @@ public class UsrController {
         }
     }
 
-
     @GetMapping("/nearestPartner")
-    public ResponseEntity<?> getPayment(@RequestHeader("Authorization") String authHeader, @RequestParam String type, @RequestParam double maxDistance) {
+    public ResponseEntity<?> getPayment(@RequestHeader("Authorization") String authHeader, @RequestParam String type,
+            @RequestParam double maxDistance) {
         String token = authHeader.replace("Bearer ", "");
-        try{
+        try {
             String email = jwtUtil.extractEmail(token);
             String role = jwtUtil.extractUserRole(token);
 
-            if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role) ) {
+            if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role)) {
                 try {
                     List<Partner> p = usrService.getNearestPartner(email, type, maxDistance * 1000);
                     if (p == null || p.isEmpty()) {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se han encontrado aliados con la distancia ingresada");
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body("No se han encontrado aliados con la distancia ingresada");
                     }
                     return ResponseEntity.ok(p);
                 } catch (Exception e) {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                             .body("Error al obtener lista de aliados: " + e.getMessage());
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+            }
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
+        }
+    }
 
     @PatchMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody Usr usr) {
@@ -228,7 +234,6 @@ public class UsrController {
                 } catch (Exception e) {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                             .body("Error al cambiar contraseña de usuario: " + e.getMessage());
-
                 }
             } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
