@@ -45,6 +45,7 @@ public class Services {
     @Column
     private String serviceType;
 
+
     @Column
     private String plate;
 
@@ -59,6 +60,7 @@ public class Services {
 
     @Column
     private LocalDate start_Date;
+
 
     @Column
     private Boolean graduated;
@@ -88,8 +90,10 @@ public class Services {
         return price;
     }
 
+
     public String getserviceType() {
         return serviceType;
+
     }
 
     public String getPlate() {
@@ -131,6 +135,7 @@ public class Services {
     public void setPrice(int price) {
         this.price = price;
     }
+
 
     public void setserviceType(String serviceType) {
         this.serviceType = serviceType;
@@ -175,6 +180,7 @@ public class Services {
     public void setGraduated(boolean graduated) {
         this.graduated = graduated;
     }
+
 
     
     

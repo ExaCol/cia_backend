@@ -6,7 +6,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost/CIAdb
     username: postgres
-    password: nico
+    password: 
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10  

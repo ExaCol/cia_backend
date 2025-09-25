@@ -115,6 +115,7 @@ public class UsrController {
         if (existingUser != null) {
             Usr u = usrService.login(user.getEmail(), user.getPassword());
 
+
             
            if (loginAttemptService.isBlocked(user.getEmail())) {
                 return ResponseEntity.status(HttpStatus.LOCKED)
@@ -123,10 +124,7 @@ public class UsrController {
             }
             
             if (u != null) {
-             //   if (loginAttemptService.isBlocked(u.getEmail())) {
-             //       return ResponseEntity.status(HttpStatus.LOCKED)
-              //              .body("Usuario bloqueado por demasiados intentos fallidos");
-             //   }
+ 
                 loginAttemptService.loginSecceeded(u.getEmail());
                 String token = jwtUtil.generateToken(u.getEmail(), u.getRole(), u.getId());
                 HashMap<String, String> response = new HashMap<>();
