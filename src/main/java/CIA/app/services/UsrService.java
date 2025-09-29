@@ -295,4 +295,34 @@ public class UsrService {
         }
         return null;
     }
+
+    public CoursesData deleteUserFromCourse(String email, CoursesData course){
+        Usr user = usrRepository.findByEmail(email);
+        if (user != null) {
+            CoursesData existingCourse = coursesDataRepository.findById(course.getId()).orElse(null);
+            if (existingCourse != null) {
+                boolean enrolled = user.getCourses().stream().anyMatch(c -> c.getId().equals(existingCourse.getId()));
+                if(enrolled){
+                    if(existingCourse.getParcialCapacity() -1 >= 0){
+                        existingCourse.setParcialCapacity(existingCourse.getParcialCapacity() -1);
+                        user.getCourses().removeIf(c -> c.getId().equals(existingCourse.getId()));
+                        usrRepository.save(user);
+                        return existingCourse;
+                    }
+                    throw new IllegalStateException("Error en capacidad parcial del curso");
+                }
+                throw new IllegalStateException("El usuario no está inscrito en ese curso");
+            }
+            throw new IllegalStateException("Curso no encontrado");
+        }
+        return null;
+    }
+
+     public List<CoursesData> getAllCourses(String email){
+        Usr usr = usrRepository.findByEmail(email);
+        if (usr != null) {
+            return coursesDataRepository.findAll();
+        }
+        return null;
+    }
 }

@@ -165,4 +165,29 @@ public class CoursesDataController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
         }
     }
+
+    @GetMapping("/getAllCourses")
+    public ResponseEntity<?> getUsersByCourse(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        try {
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
+
+            if (jwtUtil.isTokenValid(token, email) && ("Admin".equals(role) || "Cliente".equals(role))) {
+                try {
+                    List<CoursesData> courses = coursesDataService.getAllCourses(email);
+                    if (courses == null || courses.isEmpty()) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se ha podido traer los cursos");
+                    }
+                    return ResponseEntity.ok(courses);
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al buscar los cursos: " + e.getMessage());
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
+        }
+    }
 }

@@ -79,5 +79,13 @@ public class CoursesDataService {
         return null;
     }
 
+    public List<CoursesData> getAllCourses(String email){
+        Usr usr = usrService.findByEmail(email);
+        if (usr != null) {
+            return coursesDataRepository.findAll();
+        }
+        return null;
+    }
+
 
 }
