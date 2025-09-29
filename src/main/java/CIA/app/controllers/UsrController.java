@@ -7,9 +7,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -80,6 +82,10 @@ public class UsrController {
         }
     }
 
+    @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = { "Authorization", "Content-Type" }, methods = {
+            RequestMethod.GET, RequestMethod.PATCH, RequestMethod.POST, RequestMethod.DELETE,
+            RequestMethod.OPTIONS }
+    )
     @PatchMapping("/user")
     public ResponseEntity<?> updateUser(@RequestHeader("Authorization") String authHeader, @RequestBody Usr user) {
         String token = authHeader.replace("Bearer ", "");
