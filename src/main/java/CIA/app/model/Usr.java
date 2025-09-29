@@ -2,15 +2,20 @@ package CIA.app.model;
 
 import java.util.List;
 
-
+//import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+//import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -19,6 +24,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Table(name = "usr")
 public class Usr {
     @Id
@@ -42,6 +48,19 @@ public class Usr {
     @OneToMany(mappedBy = "usr", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value="usr-vehicle")
     private List<Vehicle> vehicles;
+
+    //@JsonManagedReference(value="usr-courses")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "courses_usr",
+        joinColumns = @JoinColumn(name = "usrId"),
+        inverseJoinColumns = @JoinColumn(name = "courseId")
+    )
+    private List<CoursesData> courses;
+
+    @OneToMany(mappedBy = "usr", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference(value = "usr-services") 
+    private List<Services> services;
 
     public Integer getId() {
         return id;
@@ -98,4 +117,18 @@ public class Usr {
     public void setVehicles(List<Vehicle> vehicles) {
         this.vehicles = vehicles;
     }
+    public List<CoursesData> getCourses() {
+        return courses;
+    }
+    public void setCourses(List<CoursesData> courses) {
+        this.courses = courses;
+    }
+    public List<Services> getServices() {
+        return services;
+    }
+    public void setServices(List<Services> services) {
+        this.services = services;
+    }
+
+    
 }
