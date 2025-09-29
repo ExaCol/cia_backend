@@ -8,14 +8,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+
 import java.time.LocalDateTime;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import CIA.app.model.CoursesData;
 import CIA.app.model.Partner;
 import CIA.app.model.Services;
 import CIA.app.model.Usr;
+import CIA.app.repositories.CoursesDataRepository;
 import CIA.app.repositories.ServicesRepository;
 import CIA.app.repositories.UsrRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -32,14 +37,17 @@ public class UsrService {
     @Autowired
     private final ServicesRepository servicesRepository;
     @Autowired
+    private final CoursesDataRepository coursesDataRepository;
+    @Autowired
     private TokenRepository tokenRepository;
 
     public UsrService(UsrRepository usrRepository, PasswordEncoder passwordEncoder,
-            ServicesRepository servicesRepository, TokenRepository tokenRepository) {
+            ServicesRepository servicesRepository, TokenRepository tokenRepository, CoursesDataRepository coursesDataRepository) {
         this.usrRepository = usrRepository;
         this.passwordEncoder = passwordEncoder;
         this.servicesRepository = servicesRepository;
         this.tokenRepository = tokenRepository;
+        this.coursesDataRepository = coursesDataRepository;
     }
 
     public Usr registUser(Usr user) {
@@ -249,6 +257,41 @@ public class UsrService {
                 user.setPassword(hashedNewPassword);
                 return usrRepository.save(user);
             }
+        }
+        return null;
+    }
+
+    public List<CoursesData> getCoursesByUser(String email){
+        Usr user = usrRepository.findByEmail(email);
+        if (user != null) {
+            List<CoursesData> courses = coursesDataRepository.getCoursesByUser(user.getId());
+            if(courses != null && !courses.isEmpty()){
+                return courses;
+            }
+            return null;
+        }
+
+        return null;
+    }
+
+    public CoursesData registerUserToCourse(String email, CoursesData course){
+        Usr user = usrRepository.findByEmail(email);
+        if (user != null) {
+            CoursesData existingCourse = coursesDataRepository.findById(course.getId()).orElse(null);
+            if (existingCourse != null) {
+                boolean enrolled = user.getCourses().stream().anyMatch(c -> c.getId().equals(existingCourse.getId()));
+                if(!enrolled){
+                    if(existingCourse.getParcialCapacity() + 1 <= existingCourse.getCapacity()){
+                        existingCourse.setParcialCapacity(existingCourse.getParcialCapacity() + 1);
+                        user.getCourses().add(existingCourse);
+                        usrRepository.save(user);
+                        return existingCourse;
+                    }
+                    throw new IllegalStateException("Cupo lleno");
+                }
+                throw new IllegalStateException("Inscriba un curso diferente");
+            }
+            throw new IllegalStateException("Curso no encontrado");
         }
         return null;
     }

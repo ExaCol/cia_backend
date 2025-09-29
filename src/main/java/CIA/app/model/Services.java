@@ -36,7 +36,7 @@ public class Services {
 
     @ManyToOne
     @JoinColumn(name = "usr_id", nullable = false)
-    @com.fasterxml.jackson.annotation.JsonIgnore
+    @JsonBackReference(value = "usr-services")
     private Usr usr;
 
     @Column
@@ -60,8 +60,9 @@ public class Services {
     @Column
     private LocalDate start_Date;
 
-    @Column
-    private Boolean graduated;
+    @Column(nullable = false)
+    private Boolean graduated = false;
+    
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "service-partner")
     private List<Partner> partner;
@@ -168,7 +169,7 @@ public class Services {
     }
   
     public boolean isGraduated() {
-        return graduated;
+        return Boolean.TRUE.equals(graduated);
     }
 
     public void setGraduated(boolean graduated) {

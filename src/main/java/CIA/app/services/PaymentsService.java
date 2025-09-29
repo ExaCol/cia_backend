@@ -41,7 +41,7 @@ public class PaymentsService {
 
             List<Services> existing = servicesRepository.findAllById(ids);
             if (existing.size() != ids.size()) {
-                throw new IllegalArgumentException("Ingrese servicios válidos");
+                throw new IllegalStateException("Ingrese servicios válidos");
             }
 
             for(Services s: existing){

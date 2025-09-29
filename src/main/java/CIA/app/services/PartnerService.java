@@ -40,7 +40,7 @@ public class PartnerService {
 
             Services existing = servicesService.getSpecificServices(partnerId);
             if (!partnerId.equals(existing.getId())){
-                throw new IllegalArgumentException("Ingrese un servicio válido");
+                throw new IllegalStateException("Ingrese un servicio válido");
             }
             partner.setService(existing);
             return partnerRepository.save(partner);
