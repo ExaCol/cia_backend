@@ -318,7 +318,7 @@ public class UsrService {
         return null;
     }
 
-     public List<CoursesData> getAllCourses(String email){
+    public List<CoursesData> getAllCourses(String email){
         Usr usr = usrRepository.findByEmail(email);
         if (usr != null) {
             return coursesDataRepository.findAll();
