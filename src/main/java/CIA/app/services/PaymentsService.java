@@ -82,7 +82,7 @@ public class PaymentsService {
         if(usr != null){
             return paymentsRepository.findAllByUserServicesOrderByReleaseDateDesc(usr.getId());
         }
-        return List.of();
+        return null;
     }
 
 

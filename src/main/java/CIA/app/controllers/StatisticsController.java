@@ -51,7 +51,7 @@ public class StatisticsController {
                 System.out.println(start);
                 System.out.println(end);
                 int num = paymentsService.getPaymentNumber(start, end);
-                if (num >= 0) {
+                if (num > 0) {
                     return ResponseEntity.ok("el numero de pagos hechos fue " + num);
                 } else {
                     return ResponseEntity.badRequest()
@@ -99,8 +99,11 @@ public class StatisticsController {
             String role = jwtUtil.extractUserRole(token);
 
             if (jwtUtil.isTokenValid(token, email) && ("Admin".equals(role))) {
-                Double num = paymentsService.getNetWorth() * 0.2;
+                
+                Double num = paymentsService.getNetWorth();
+            
                 if (num != null) {
+                    num = num * 0.2;
                     return ResponseEntity.ok("la ganancia neta es de: " + num);
                 } else {
                     return ResponseEntity.badRequest().body("No se encontraron pagos.");
@@ -123,7 +126,7 @@ public class StatisticsController {
 
             if (jwtUtil.isTokenValid(token, email) && ("Admin".equals(role))) {
                 Double num = paymentsService.savedUsrMoney();
-                if (num != null) {
+                if (num > 0) {
                     return ResponseEntity.ok("el dinero ahorrado por los usuarios es de: " + num);
                 } else {
                     return ResponseEntity.badRequest().body("No se encontraron pagos.");
@@ -147,7 +150,7 @@ public class StatisticsController {
 
             if (jwtUtil.isTokenValid(token, email) && ("Admin".equals(role))) {
                 Double num = paymentsService.earningsByCat(type);
-                if (num != null) {
+                if (num > 0) {
                     return ResponseEntity.ok("ganancias por " + type + " son: " + num);
                 } else {
                     return ResponseEntity.badRequest().body("No se encontraron pagos.");
@@ -171,7 +174,7 @@ public class StatisticsController {
 
             if (jwtUtil.isTokenValid(token, email) && ("Admin".equals(role))) {
                 Integer num = paymentsService.graduatedNum();
-                if (num != null) {
+                if (num>0) {
                     return ResponseEntity.ok("el numero de nuevos conductores es: " + num);
                 } else {
                     return ResponseEntity.badRequest().body("No se encontraron nuevos conductores");
