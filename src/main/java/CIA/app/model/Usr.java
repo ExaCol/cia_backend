@@ -129,6 +129,5 @@ public class Usr {
     public void setServices(List<Services> services) {
         this.services = services;
     }
-
     
 }

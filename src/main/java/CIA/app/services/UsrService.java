@@ -94,6 +94,8 @@ public class UsrService {
                 }
             }
             user.setName(req.getName());
+            user.setLon(req.getLon());
+            user.setLat(req.getLat());
             return usrRepository.save(user);
         }
         return null;

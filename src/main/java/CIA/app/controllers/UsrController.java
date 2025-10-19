@@ -167,7 +167,7 @@ public class UsrController {
                 return ResponseEntity.ok(response);
             } else {
                 loginAttemptService.loginFailed(user.getEmail());
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
             }
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");

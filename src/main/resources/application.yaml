@@ -1,15 +1,15 @@
 # Configuración de servidor
 server:
-  port: 8080  
+  port: 8080
 
 spring:
   datasource:
     url: jdbc:postgresql://localhost/CIAdb
     username: postgres
-    password: nico
+    password: Nacionalcampeon04.
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 10  
+      maximum-pool-size: 10
   jpa:
     hibernate:
       ddl-auto: update
@@ -26,8 +26,6 @@ spring:
           auth: true
           starttls:
             enable: true
-          connectiontimeout: 60000  
-          timeout: 60000              
-          writetimeout: 60000    
-    
-
+          connectiontimeout: 60000
+          timeout: 60000
+          writetimeout: 60000
