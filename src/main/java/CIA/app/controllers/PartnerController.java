@@ -30,7 +30,7 @@ public class PartnerController {
         this.partnerService = partnerService;
         this.jwtUtil = jwtUtil;
     }
-
+    
     @PostMapping("/create")
     public ResponseEntity<?> createPayments(@RequestHeader("Authorization") String authHeader, @RequestBody Partner partner, @RequestBody Services services) {
         String token = authHeader.replace("Bearer ", "");
@@ -118,4 +118,38 @@ public class PartnerController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
         }
     }
+<<<<<<< Updated upstream
+=======
+
+    @PatchMapping("/partner")
+    public ResponseEntity<?> updateUser(@RequestHeader("Authorization") String authHeader, @RequestBody Partner partner) {
+        String token = authHeader.replace("Bearer ", "");
+        try{
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
+
+            if (jwtUtil.isTokenValid(token, email)
+                    && ("Admin".equals(role) || "Empleado".equals(role))) {
+                try {
+                    Partner p = partnerService.update(email, partner);
+                    if (p != null) {
+                        return ResponseEntity.ok("Partner actualizado correctamente");
+                    } else {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se encontró el partner");
+                    }
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Error al actualizar partner: " + e.getMessage());
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+            }
+        }catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
+        }
+            
+    }
+>>>>>>> Stashed changes
 }
+
+

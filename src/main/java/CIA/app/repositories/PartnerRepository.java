@@ -1,6 +1,7 @@
 package CIA.app.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 //import java.util.List;
 
@@ -14,11 +15,35 @@ import CIA.app.model.Partner;
 
 public interface PartnerRepository extends JpaRepository<Partner, Integer>{
 
-    @Query("""
+ @Query("""
         select p
         from Partner p
-        where p.service.id = :id
+        where p.id = :id
         """)
-    List<Partner> getPartnersByServices(@Param("id") Integer id);
+    Optional<Partner> getPartnersById(@Param("id") Integer id);
+ 
+    
+    @Query(
+        """
+          SELECT p
+          FROM Partner p
+          WHERE p.soat = true      
+        """)
+    List<Partner> getPartnersBySoat();
 
+    @Query(
+        """
+          SELECT p
+          FROM Partner p
+          WHERE p.techno = true      
+        """)
+    List <Partner> getPartnersByTechno();
+
+    @Query(
+      """
+          SELECT p
+          FROM Partner p
+          WHERE p.name = 'CIA'     
+        """)
+        List <Partner> getCIA();
 }

@@ -53,6 +53,23 @@ public class ServicesService {
 
         return null;
     }
+<<<<<<< Updated upstream
+=======
+ 
+    public boolean updateGraduated(Integer id){
+        Optional<Services> s = servicesRepository.findById(id);
+        if(s.isPresent()){
+            if(s.get().isGraduated()){
+                return false;
+            }
+            s.get().setGraduated(true);
+            servicesRepository.save(s.get());
+            return true;
+        }
+        return false;
+    }
+
+>>>>>>> Stashed changes
 
     
 }

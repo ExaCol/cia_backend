@@ -61,13 +61,25 @@ public class Services {
     @Column
     private LocalDate start_Date;
 
+<<<<<<< Updated upstream
 
     @Column
     private Boolean graduated;
 
+=======
+    @Column(nullable = false)
+    private Boolean graduated = false;
+    
+    /* 
+>>>>>>> Stashed changes
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "service-partner")
-    private List<Partner> partner;
+    private List<Partner> partner;*/
+
+    @ManyToOne
+    @JoinColumn(name = "partner_id")
+    @JsonBackReference(value="service-partner")
+    private Partner partner;
 
     @ManyToOne
     @JoinColumn(name = "payment_id")
@@ -116,10 +128,6 @@ public class Services {
         return start_Date;
     }
 
-    public List<Partner> getPartner() {
-        return partner;
-    }
-
     public void setId(Integer id) {
         this.id = id;
     }
@@ -161,7 +169,19 @@ public class Services {
         this.start_Date = start_Date;
     }
 
-    public void setPartner(List<Partner> partner) {
+    public Boolean isGraduated() {
+        return graduated;
+    }
+
+    public void setGraduated(Boolean graduated) {
+        this.graduated = graduated;
+    }
+
+    public Partner getPartner() {
+        return partner;
+    }
+
+    public void setPartner(Partner partner) {
         this.partner = partner;
     }
 
@@ -172,6 +192,7 @@ public class Services {
     public void setPayment(Payments payment) {
         this.payment = payment;
     }
+<<<<<<< Updated upstream
 
     public boolean isGraduated() {
         return graduated;
@@ -180,6 +201,8 @@ public class Services {
     public void setGraduated(boolean graduated) {
         this.graduated = graduated;
     }
+=======
+>>>>>>> Stashed changes
 
 
     

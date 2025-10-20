@@ -113,8 +113,42 @@ public class ServicesController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body("Error al obtener servicio: " + e.getMessage());
             }
+<<<<<<< Updated upstream
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+=======
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
+        }
+    }
+    
+    @PatchMapping("/update-state-graduated/{id}")
+    public ResponseEntity<?> updateStateGraduated(@RequestHeader("Authorization") String authHeader,
+            @PathVariable int id) {
+        String token = authHeader.replace("Bearer ", "");
+        try {
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
+
+            if (jwtUtil.isTokenValid(token, email)
+                    && ("Cliente".equals(role) || "Admin".equals(role) || "Empleado".equals(role))) {
+                try {
+                    boolean updated = servicesService.updateGraduated(id);
+                    if (updated) {
+                        servicesService.updateGraduated(id);
+                        return ResponseEntity.ok("Estado de graduación actualizado correctamente");
+                    }
+                    return ResponseEntity.badRequest().body("Ya estaba graduado o Servicio no encontrado");
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Error al cambiar estado de graduación: " + e.getMessage());
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+            }
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
+>>>>>>> Stashed changes
         }
     }
 }

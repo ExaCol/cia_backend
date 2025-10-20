@@ -16,23 +16,51 @@ import CIA.app.repositories.PartnerRepository;
 
 @Service
 public class PartnerService {
+<<<<<<< Updated upstream
     @Autowired
     private PartnerRepository partnerRepository;
     @Autowired
     private UsrService usrService;
     @Autowired
     private ServicesService servicesService;
+=======
+    
+    private final PartnerRepository partnerRepository;
+    
+    private final UsrService usrService;
+    
+    private final ServicesService servicesService;
+>>>>>>> Stashed changes
 
     public PartnerService(PartnerRepository partnerRepository, UsrService usrService, ServicesService servicesService) {
         this.partnerRepository = partnerRepository;
         this.usrService = usrService;
         this.servicesService = servicesService;
     }
+<<<<<<< Updated upstream
 
     public Partner createPartner(String email, Partner partner, Services service){
         Usr user = usrService.findByEmail(email);
         if (user != null) {
             partner.setService(service);
+=======
+ 
+    public Partner createPartner(String email, Partner partner){
+        Usr user = usrService.findByEmail(email);
+        if (user != null) {
+            
+            //Integer partnerId = partner.getService().getId();
+            //if (partnerId.equals(null)) {
+            //    throw new IllegalArgumentException("El partner debe tener un servicio asociado");
+            //}
+
+            //Services existing = servicesService.getSpecificServices(partnerId);
+            //if (!partnerId.equals(existing.getId())){
+            //    throw new IllegalStateException("Ingrese un servicio válido");
+            //}
+            //partner.setService(existing);
+            
+>>>>>>> Stashed changes
             return partnerRepository.save(partner);
         }
         return null;
@@ -43,13 +71,20 @@ public class PartnerService {
         return p.orElse(null);
     }
 
+<<<<<<< Updated upstream
     public List<Partner> getPartnersByServices(Services services){
         if (servicesService.getSpecificServices(services) != null) {
             return partnerRepository.getPartnersByServices(services.getId());
+=======
+    
+    public List<Partner> getPartnersByServices(Integer serviceId){
+        if (servicesService.getSpecificServices(serviceId) != null) {
+            //return partnerRepository.getPartnersByServices(serviceId);
+>>>>>>> Stashed changes
         }
         return null;
     }
-
+ 
     public Partner deleteSpecificPartner(Partner partner) {
         Partner p = getSpecificPartner(partner);
         if (p != null) {
@@ -59,6 +94,7 @@ public class PartnerService {
         return null;
     }
 
+<<<<<<< Updated upstream
     // public Partner update(String currentEmail, Partner partner) {
     //     Usr user = usrService.findByEmail(currentEmail);
     //     if(user != null){
@@ -72,3 +108,19 @@ public class PartnerService {
     //     return null;
     // }
 }
+=======
+    public Partner update(String email, Partner partner){
+        Usr user = usrService.findByEmail(email);
+        if(user != null){
+            Partner sPartner = getSpecificPartner(partner.getId());
+            if(sPartner.getId().equals(partner.getId())){
+                sPartner.setSoat(partner.isSoat());
+                sPartner.setTechno(partner.isTechno());
+                return partnerRepository.save(sPartner);
+            }
+        }
+        return null;
+    }
+    
+}
+>>>>>>> Stashed changes

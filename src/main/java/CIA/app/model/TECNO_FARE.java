@@ -3,18 +3,31 @@ package CIA.app.model;
 import java.sql.Date;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class TECNO_FARE {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Date start_date;
-    private Date end_date;
+    
+    private String type;
+    private Integer startYear;
+    private Integer endYear;
     private int price;
+
+    
+
+
+
+    
 }

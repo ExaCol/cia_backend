@@ -138,4 +138,187 @@ public class UsrController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
         }
     }
+<<<<<<< Updated upstream
+=======
+    
+    /*
+    @GetMapping("/nearestPartner")
+    public ResponseEntity<?> getPayment(@RequestHeader("Authorization") String authHeader, @RequestParam String type,
+            @RequestParam double maxDistance) {
+        String token = authHeader.replace("Bearer ", "");
+        try {
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
+
+            if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role)) {
+                try {
+                    List<Partner> p = usrService.getNearestPartner(email, type, maxDistance * 1000);
+                    if (p == null || p.isEmpty()) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body("No se han encontrado aliados con la distancia ingresada");
+                    }
+                    return ResponseEntity.ok(p);
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Error al obtener lista de aliados: " + e.getMessage());
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+            }
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
+        }
+    }
+ */
+    @PatchMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody Usr usr) {
+        Usr u = usrService.changePassword(usr);
+        if (u != null) {
+            return ResponseEntity.ok("Contraseña actualizada correctamente");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al actualizar la contraseña");
+        }
+    }
+
+    @PatchMapping("/update-password")
+    public ResponseEntity<?> updatePassword(@RequestHeader("Authorization") String authHeader,
+            @RequestBody ChangePassword changePassword) {
+        String token = authHeader.replace("Bearer ", "");
+        try {
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
+
+            if (jwtUtil.isTokenValid(token, email)
+                    && ("Cliente".equals(role) || "Admin".equals(role) || "Empleado".equals(role))) {
+                try {
+                    Usr existingUser = usrService.login(email, changePassword.getPasswordCurrent());
+                    if (existingUser != null) {
+                        Usr updatedUser = usrService.updatePassword(email, changePassword.getPasswordCurrent(),
+                                changePassword.getPasswordNew());
+                        if (updatedUser != null) {
+                            return ResponseEntity.ok("Contraseña cambiada correctamente");
+                        }
+                    }
+                    return ResponseEntity.badRequest().body("La contraseña actual es incorrecta");
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Error al cambiar contraseña de usuario: " + e.getMessage());
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+            }
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
+        }
+    }
+
+    @PostMapping("/registerCourse")
+    public ResponseEntity<?> registerUserToCourse(@RequestHeader("Authorization") String authHeader, @RequestBody CoursesData coursesData){
+        String token = authHeader.replace("Bearer ", "");
+        try {
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
+
+            if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role)) {
+                try {
+                    CoursesData course = usrService.registerUserToCourse(email, coursesData);
+                    if (course == null) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body("Seleccione un curso válido");
+                    }
+                    return ResponseEntity.ok(course);
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Error al inscribir en curso: " + e.getMessage());
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+            }
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
+        }
+
+    }
+
+    @GetMapping("/courseByUser")
+    public ResponseEntity<?> getCoursesByUser(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        try {
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
+
+            if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role)) {
+                try {
+                    List<CoursesData> courses = usrService.getCoursesByUser(email);
+                    if (courses == null || courses.isEmpty()) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body("Aún no tiene cursos registrados ");
+                    }
+                    return ResponseEntity.ok(courses);
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Error al obtener lista de cursos: " + e.getMessage());
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+            }
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
+        }
+    }
+
+    @DeleteMapping("/deleteUserFromCourse")
+    public ResponseEntity<?> deleteUserFromCourse(@RequestHeader("Authorization") String authHeader, @RequestBody CoursesData coursesData){
+        String token = authHeader.replace("Bearer ", "");
+        try {
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
+
+            if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role)) {
+                try {
+                    CoursesData course = usrService.deleteUserFromCourse(email, coursesData);
+                    if (course == null) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body("Usuario no encontrado, intente nuevamente");
+                    }
+                    return ResponseEntity.ok(course);
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Error al cancelar curso: " + e.getMessage());
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+            }
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
+        }
+
+    }
+
+    @GetMapping("/getAllCourses")
+    public ResponseEntity<?> getUsersByCourse(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        try {
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
+
+            if (jwtUtil.isTokenValid(token, email) && ("Admin".equals(role) || "Cliente".equals(role))) {
+                try {
+                    List<CoursesData> courses = usrService.getAllCourses(email);
+                    if (courses == null || courses.isEmpty()) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No hay cursos disponibles");
+                    }
+                    return ResponseEntity.ok(courses);
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al buscar los cursos: " + e.getMessage());
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
+        }
+    }
+
+>>>>>>> Stashed changes
 }
