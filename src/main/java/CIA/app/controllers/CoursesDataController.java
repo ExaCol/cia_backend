@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import CIA.app.components.JwtUtil;
 import CIA.app.model.CoursesData;
+import CIA.app.model.Partner;
 import CIA.app.model.Usr;
 import CIA.app.services.CoursesDataService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -190,4 +191,6 @@ public class CoursesDataController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
         }
     }
+
+     
 }

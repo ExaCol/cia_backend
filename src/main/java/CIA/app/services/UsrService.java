@@ -21,6 +21,7 @@ import CIA.app.model.Partner;
 import CIA.app.model.Services;
 import CIA.app.model.Usr;
 import CIA.app.repositories.CoursesDataRepository;
+import CIA.app.repositories.PartnerRepository;
 import CIA.app.repositories.ServicesRepository;
 import CIA.app.repositories.UsrRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +31,9 @@ import CIA.app.repositories.TokenRepository;
 @Slf4j
 @Service
 public class UsrService {
+    
     @Autowired
-    private final UsrRepository usrRepository;
+    private UsrRepository usrRepository;
     @Autowired
     private final PasswordEncoder passwordEncoder;
     @Autowired
@@ -40,15 +42,21 @@ public class UsrService {
     private final CoursesDataRepository coursesDataRepository;
     @Autowired
     private TokenRepository tokenRepository;
+    @Autowired
+    private PartnerRepository partnerRepository;
+
 
     public UsrService(UsrRepository usrRepository, PasswordEncoder passwordEncoder,
-            ServicesRepository servicesRepository, TokenRepository tokenRepository, CoursesDataRepository coursesDataRepository) {
+            ServicesRepository servicesRepository, CoursesDataRepository coursesDataRepository,
+            TokenRepository tokenRepository, PartnerRepository partnerRepository) {
         this.usrRepository = usrRepository;
         this.passwordEncoder = passwordEncoder;
         this.servicesRepository = servicesRepository;
-        this.tokenRepository = tokenRepository;
         this.coursesDataRepository = coursesDataRepository;
+        this.tokenRepository = tokenRepository;
+        this.partnerRepository = partnerRepository;
     }
+
 
     public Usr registUser(Usr user) {
         Usr existingUser = usrRepository.findByEmail(user.getEmail());
@@ -94,14 +102,12 @@ public class UsrService {
                 }
             }
             user.setName(req.getName());
-            user.setLon(req.getLon());
-            user.setLat(req.getLat());
             return usrRepository.save(user);
         }
         return null;
     }
 
-    public List<Partner> getNearestPartner(String email, String type, double maxDistance) {
+    /*public List<Partner> getNearestPartner(String email, String type, double maxDistance) {
         log.info("Variables: " + email + " " + type + " " + maxDistance);
         Usr user = findByEmail(email);
         if (user != null) {
@@ -129,6 +135,20 @@ public class UsrService {
 
         }
         return null;
+    }*/
+
+    public List<Partner>  getNearestPartner(String email, String type, double maxDistance){
+
+        Usr user = findByEmail(email);
+        List<Partner> partners = new ArrayList<>();
+        if(user == null){
+        partners = getPartnerByService(type);
+        if(partners == null || partners.isEmpty()){
+            return Collections.emptyList();
+        }
+    }
+
+        return calculateDistance(user,partners, maxDistance);
     }
 
     public String generarToken(String email) {
@@ -165,7 +185,7 @@ public class UsrService {
         return null;
     }
 
-    public Map<Integer, Partner> getPartnersByTypeServicesNR(String type) {
+    /*public Map<Integer, Partner> getPartnersByTypeServicesNR(String type) {
 
         List<Services> sR = servicesRepository.getServicesByType(type);
         if (sR == null || sR.isEmpty())
@@ -186,7 +206,17 @@ public class UsrService {
         }
 
         return partnersMapWR;
+    }*/
+
+    public List<Partner> getPartnerByService(String type){
+        if(type.equals("SOAT")){
+            return partnerRepository.getPartnersBySoat();
+        }else if(type.equals("techno")){
+        return partnerRepository.getPartnersByTechno();
     }
+    return partnerRepository.getCIA();
+    }
+
 
     private List<Partner> calculateDistance(Usr user, List<Partner> partners, double maxDistance) {
         double userLat = user.getLat();

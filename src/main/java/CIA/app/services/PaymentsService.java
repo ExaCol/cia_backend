@@ -100,7 +100,7 @@ public class PaymentsService {
     }
 
     public Double savedUsrMoney(){
-        return paymentsRepository.savedUsrMoney("SIMIT");
+        return paymentsRepository.savedUsrMoney("TICKET");
     }
 
     public Integer graduatedNum(){

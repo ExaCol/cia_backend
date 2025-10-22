@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import CIA.app.components.JwtUtil;
-import CIA.app.dtos.ChangePassword;
 import CIA.app.model.Services;
-import CIA.app.model.Usr;
 import CIA.app.services.ServicesService;
 import io.jsonwebtoken.ExpiredJwtException;
 
@@ -172,4 +170,5 @@ public class ServicesController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
         }
     }
+
 }

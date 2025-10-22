@@ -2,6 +2,7 @@ package CIA.app.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 //import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 //import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -58,8 +59,10 @@ public class Usr {
     )
     private List<CoursesData> courses;
 
+    
     @OneToMany(mappedBy = "usr", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference(value = "usr-services") 
+    //@JsonManagedReference(value = "usr-services") 
+    @JsonIgnore
     private List<Services> services;
 
     public Integer getId() {
@@ -129,5 +132,6 @@ public class Usr {
     public void setServices(List<Services> services) {
         this.services = services;
     }
+
     
 }

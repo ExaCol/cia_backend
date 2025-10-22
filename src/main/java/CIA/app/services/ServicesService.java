@@ -75,7 +75,7 @@ public class ServicesService {
         }
         return false;
     }
-
+    
     // public Map<Integer, Partner> getPartnersByTypeServicesNR(String email, String type){
     //     Usr user = usrService.findByEmail(email);
     //     if (user != null) {

@@ -36,11 +36,16 @@ public class CoursesData {
     private int parcialCapacity;
 
     @Column
+    private String type;
+
+    @Column
+    private double price;
+    
+    @Column
     private int capacity;
 
     @ManyToMany(mappedBy = "courses", fetch = FetchType.LAZY)
     @com.fasterxml.jackson.annotation.JsonIgnore
-    //@JsonBackReference(value="usr-courses")
     private List<Usr> usrs;
 
     public Integer getId() {
@@ -82,6 +87,23 @@ public class CoursesData {
     public void setParcialCapacity(int parcialCapacity) {
         this.parcialCapacity = parcialCapacity;
     }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+    
     
     
 }

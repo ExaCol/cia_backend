@@ -34,7 +34,6 @@ public class VehicleController {
     }
 
     @PostMapping("/save")
-
     public ResponseEntity<?> saveVehicle(@RequestHeader("Authorization") String authHeader,
             @RequestBody Vehicle vehicle) {
         String token = authHeader.replace("Bearer ", "");
