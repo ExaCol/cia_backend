@@ -84,10 +84,10 @@ public class UsrServiceTest {
         return p;
     }
 
-    private static Services makeService(String type, Partner partner){
+    private static Services makeService(String type, Partner partners){
         Services s = new Services();
         s.setServiceType(type);
-        s.setPartner(partner);
+        s.setPartner(partners);
         return s;
     }
 
@@ -325,7 +325,7 @@ public class UsrServiceTest {
         verify(usrRepository).findByEmail(email);
         verify(coursesDataRepository).findById(simulatedCourse.getId());
     }
-    
+
     @Test
     void getNearestPartner_success(){
         String email = "exatest@gmail.com";
@@ -337,14 +337,13 @@ public class UsrServiceTest {
         Partner p2 = makePartner(2, "Partner B", 4.6862, -74.119); //Más lejano
         Partner p3 = makePartner(3, "Partner C", 4.685, -74.118); //Más cercano
         
-        /*List<Partner> servicePartnersA = new ArrayList<>();
+        List<Partner> servicePartnersA = new ArrayList<>();
         servicePartnersA.add(p1);
         servicePartnersA.add(p2);
 
         List<Partner> servicePartnersB = new ArrayList<>();
-        servicePartnersB.add(p3);*/
+        servicePartnersB.add(p3);
 
-        /*
         Services s1 = makeService(type, p1);
         Services s2 = makeService(type, p2);
 
@@ -358,7 +357,7 @@ public class UsrServiceTest {
         assertEquals(List.of(p3, p1), outPartners);
         verify(usrRepository).findByEmail(email);
         verify(servicesRepository).getServicesByType(type);
- */
+
     }
 
     @Test
@@ -369,7 +368,7 @@ public class UsrServiceTest {
         Partner p2 = makePartner(2, "Partner B", 4.6862, -74.119); //Más lejano
         Partner p3 = makePartner(3, "Partner C", 4.685, -74.118);  //Más cercano
         
-        /*List<Partner> servicePartnersA = new ArrayList<>();
+        List<Partner> servicePartnersA = new ArrayList<>();
         servicePartnersA.add(p1);
         servicePartnersA.add(p2);
 
@@ -379,25 +378,23 @@ public class UsrServiceTest {
 
         List<Partner> servicePartnersC = new ArrayList<>();
         servicePartnersA.add(null);
-        servicePartnersA.add(p2);*/
+        servicePartnersA.add(p2);
 
-        /*
         Services s1 = makeService(type, p1);
         Services s2 = makeService(type, p2);
         Services s3 = makeService(type, p3);
 
         when(servicesRepository.getServicesByType(type)).thenReturn(List.of(s1, s2, s3));
 
-        Map<Integer, Partner> outMap = usrService.getPartnersByTypeServicesNR(type);
+        List<Partner> outMap = usrService.getPartnerByService(type);
 
         assertNotNull(outMap);
         assertEquals(3, outMap.size());
-        assertTrue(outMap.containsKey(p1.getId()));
-        assertTrue(outMap.containsKey(p2.getId()));
-        assertTrue(outMap.containsKey(p3.getId()));
+        //assertTrue(outMap.containsKey(p1.getId()));
+        //assertTrue(outMap.containsKey(p2.getId()));
+        //assertTrue(outMap.containsKey(p3.getId()));
         verify(servicesRepository).getServicesByType(type);
-         */
     }
- 
+
     
 }

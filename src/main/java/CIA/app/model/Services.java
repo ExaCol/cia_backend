@@ -61,20 +61,10 @@ public class Services {
     @Column
     private LocalDate start_Date;
 
-<<<<<<< Updated upstream
-
-    @Column
-    private Boolean graduated;
-
-=======
     @Column(nullable = false)
     private Boolean graduated = false;
     
-    /* 
->>>>>>> Stashed changes
-    @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference(value = "service-partner")
-    private List<Partner> partner;*/
+
 
     @ManyToOne
     @JoinColumn(name = "partner_id")
@@ -192,17 +182,19 @@ public class Services {
     public void setPayment(Payments payment) {
         this.payment = payment;
     }
-<<<<<<< Updated upstream
 
-    public boolean isGraduated() {
+    public String getServiceType() {
+        return serviceType;
+    }
+
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
+    }
+
+    public Boolean getGraduated() {
         return graduated;
     }
 
-    public void setGraduated(boolean graduated) {
-        this.graduated = graduated;
-    }
-=======
->>>>>>> Stashed changes
 
 
     

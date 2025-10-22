@@ -1,6 +1,5 @@
 package CIA.app.services;
 
-
 import java.time.LocalDate;
 
 import java.util.List;
@@ -13,10 +12,7 @@ import CIA.app.model.Usr;
 import CIA.app.model.Payments;
 import CIA.app.model.Services;
 import CIA.app.repositories.PaymentsRepository;
-
 import CIA.app.repositories.ServicesRepository;
-
-
 
 @Service
 public class PaymentsService {
@@ -25,9 +21,8 @@ public class PaymentsService {
     private PaymentsRepository paymentsRepository;
     @Autowired
     private UsrService usrService;
-
     @Autowired 
-    ServicesRepository servicesRepository;
+    private ServicesRepository servicesRepository;
 
     public PaymentsService(PaymentsRepository paymentsRepository, UsrService usrService, ServicesRepository servicesRepository) {
         this.paymentsRepository = paymentsRepository;
@@ -46,15 +41,13 @@ public class PaymentsService {
 
             List<Services> existing = servicesRepository.findAllById(ids);
             if (existing.size() != ids.size()) {
-                throw new IllegalArgumentException("Ingrese servicios vÃ¡lidos");
+                throw new IllegalStateException("Ingrese servicios válidos");
             }
 
             for(Services s: existing){
                 s.setPayment(payment);
             }
-
             payment.setServices(existing);
-
             return paymentsRepository.save(payment);
         }
         return null;
@@ -68,17 +61,14 @@ public class PaymentsService {
         return null;
     }
 
-
     public Payments getSpecificPayments(Integer paymentId){
         Optional<Payments> p = paymentsRepository.findById(paymentId);
-
         return p.orElse(null);
     }
 
     public Payments deleteEspecificPayments(Payments payment){
 
         Payments p = getSpecificPayments(payment.getId());
-
         if(p != null){
             paymentsRepository.delete(p);
             return p;
@@ -87,13 +77,12 @@ public class PaymentsService {
         return null;
     }
 
-
     public List<Payments> getPaymentHistoryByUserId(String email){
         Usr usr = usrService.findByEmail(email);
         if(usr != null){
             return paymentsRepository.findAllByUserServicesOrderByReleaseDateDesc(usr.getId());
         }
-        return List.of();
+        return null;
     }
 
 
@@ -111,7 +100,7 @@ public class PaymentsService {
     }
 
     public Double savedUsrMoney(){
-        return paymentsRepository.savedUsrMoney("SIMIT");
+        return paymentsRepository.savedUsrMoney("TICKET");
     }
 
     public Integer graduatedNum(){

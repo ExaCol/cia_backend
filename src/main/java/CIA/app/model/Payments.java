@@ -32,7 +32,6 @@ public class Payments {
     @Column
     private LocalDate releaseDate;
 
-
     @Column
     private int amount;
 
@@ -50,7 +49,6 @@ public class Payments {
     public void setId(Integer id) {
         this.id = id;
     }
-
 
     public LocalDate getreleaseDate() {
         return releaseDate;

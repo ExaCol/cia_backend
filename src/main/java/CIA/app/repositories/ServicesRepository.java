@@ -17,5 +17,11 @@ public interface ServicesRepository extends JpaRepository<Services, Integer>{
            """)
     List<Services> getServicesByUser(@Param("id") Integer id);
 
+    @Query("""
+           select s
+           from Services s
+           where s.serviceType = :type
+           """)
+    List<Services> getServicesByType(@Param("type") String type);
 
 }

@@ -1,30 +1,40 @@
 package CIA.app.services;
 
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+
+import java.time.LocalDateTime;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import CIA.app.model.CoursesData;
+import CIA.app.model.Partner;
+import CIA.app.model.Services;
 import CIA.app.model.Usr;
-<<<<<<< Updated upstream
-=======
 import CIA.app.repositories.CoursesDataRepository;
 import CIA.app.repositories.PartnerRepository;
 import CIA.app.repositories.ServicesRepository;
->>>>>>> Stashed changes
 import CIA.app.repositories.UsrRepository;
+import lombok.extern.slf4j.Slf4j;
+import CIA.app.model.Token;
+import CIA.app.repositories.TokenRepository;
 
+@Slf4j
 @Service
 public class UsrService {
+    
     @Autowired
     private UsrRepository usrRepository;
     @Autowired
-<<<<<<< Updated upstream
-    private PasswordEncoder passwordEncoder;
-
-    public UsrService(UsrRepository usrRepository, PasswordEncoder passwordEncoder) {
-        this.usrRepository = usrRepository;
-        this.passwordEncoder = passwordEncoder;
-=======
     private final PasswordEncoder passwordEncoder;
     @Autowired
     private final ServicesRepository servicesRepository;
@@ -45,8 +55,8 @@ public class UsrService {
         this.coursesDataRepository = coursesDataRepository;
         this.tokenRepository = tokenRepository;
         this.partnerRepository = partnerRepository;
->>>>>>> Stashed changes
     }
+
 
     public Usr registUser(Usr user) {
         Usr existingUser = usrRepository.findByEmail(user.getEmail());
@@ -96,11 +106,8 @@ public class UsrService {
         }
         return null;
     }
-<<<<<<< Updated upstream
-=======
 
-    /*
-    public List<Partner> getNearestPartner(String email, String type, double maxDistance) {
+    /*public List<Partner> getNearestPartner(String email, String type, double maxDistance) {
         log.info("Variables: " + email + " " + type + " " + maxDistance);
         Usr user = findByEmail(email);
         if (user != null) {
@@ -128,8 +135,8 @@ public class UsrService {
 
         }
         return null;
-    }
- */
+    }*/
+
     public List<Partner>  getNearestPartner(String email, String type, double maxDistance){
 
         Usr user = findByEmail(email);
@@ -177,8 +184,8 @@ public class UsrService {
         }
         return null;
     }
- /*
-    public Map<Integer, Partner> getPartnersByTypeServicesNR(String type) {
+
+    /*public Map<Integer, Partner> getPartnersByTypeServicesNR(String type) {
 
         List<Services> sR = servicesRepository.getServicesByType(type);
         if (sR == null || sR.isEmpty())
@@ -199,8 +206,8 @@ public class UsrService {
         }
 
         return partnersMapWR;
-    }
- */
+    }*/
+
     public List<Partner> getPartnerByService(String type){
         if(type.equals("SOAT")){
             return partnerRepository.getPartnersBySoat();
@@ -209,7 +216,8 @@ public class UsrService {
     }
     return partnerRepository.getCIA();
     }
-    
+
+
     private List<Partner> calculateDistance(Usr user, List<Partner> partners, double maxDistance) {
         double userLat = user.getLat();
         double userLon = user.getLon();
@@ -223,6 +231,45 @@ public class UsrService {
                 .map(Map.Entry::getKey)
                 .toList();
 
+        // log.info("calculateDistance: userLat={}, userLon={}, maxDistance={}",
+        // userLat, userLon, maxDistance);
+        // log.info("Partners recibidos: {}", partners.size());
+
+        // return partners.stream()
+        // .peek(p -> log.info("IN -> id={} name={} lat={} lon={}",
+        // p.getId(), p.getName(), p.getLat(), p.getLon()))
+        // .filter(p -> {
+        // boolean ok = p.getLat() != null && p.getLon() != null;
+        // if (!ok) log.info("DESCARTE (coords nulas) -> id={} name={}", p.getId(),
+        // p.getName());
+        // return ok;
+        // })
+        // .map(p -> new AbstractMap.SimpleEntry<>(
+        // p, approxMetersBogota(userLat, userLon, p.getLat(), p.getLon())
+        // ))
+        // .peek(e -> log.info("DIST -> id={} name={} d≈{}m",
+        // e.getKey().getId(), e.getKey().getName(), String.format("%.1f",
+        // e.getValue())))
+        // .filter(e -> {
+        // boolean ok = e.getValue() <= maxDistance;
+        // if (!ok) log.info("FUERA_RADIO -> id={} name={} d={}m > {}m",
+        // e.getKey().getId(), e.getKey().getName(),
+        // String.format("%.1f", e.getValue()), String.format("%.1f", maxDistance));
+        // return ok;
+        // })
+
+        // .sorted(Comparator.comparingDouble(Map.Entry::getValue))
+        // .peek(new java.util.function.Consumer<Map.Entry<Partner, Double>>() {
+        // int rank = 0;
+        // @Override public void accept(Map.Entry<Partner, Double> e) {
+        // log.info("RANK #{} -> id={} name={} d≈{}m",
+        // ++rank, e.getKey().getId(), e.getKey().getName(), String.format("%.1f",
+        // e.getValue()));
+        // }
+        // })
+
+        // .map(Map.Entry::getKey)
+        // .toList();
 
     }
 
@@ -310,5 +357,4 @@ public class UsrService {
         }
         return null;
     }
->>>>>>> Stashed changes
 }

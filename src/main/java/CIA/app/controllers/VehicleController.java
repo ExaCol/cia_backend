@@ -17,6 +17,9 @@ import CIA.app.components.JwtUtil;
 import CIA.app.model.Vehicle;
 import CIA.app.services.VehicleService;
 
+import io.jsonwebtoken.ExpiredJwtException;
+
+
 @RestController
 @RequestMapping("/vehicle")
 public class VehicleController {
@@ -31,90 +34,112 @@ public class VehicleController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<?> saveVehicle(@RequestHeader("Authorization") String authHeader, @RequestBody Vehicle vehicle) {
+    public ResponseEntity<?> saveVehicle(@RequestHeader("Authorization") String authHeader,
+            @RequestBody Vehicle vehicle) {
         String token = authHeader.replace("Bearer ", "");
-        String email = jwtUtil.extractEmail(token);
-        String role = jwtUtil.extractUserRole(token);
+        try {
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
 
-        if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role) ) {
-            try {
-                Vehicle v = vehicleService.saveVehicle(email, vehicle);
+            if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role)) {
+                try {
+                    Vehicle v = vehicleService.saveVehicle(email, vehicle);
                     if (v == null) {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El vehículo ya está registrado o el usuario no existe");
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body("El vehículo ya está registrado");
                     }
-                return ResponseEntity.status(HttpStatus.CREATED).body("Vehículo guardado exitosamente");
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Error al registrar vehículo: " + e.getMessage());
+                    return ResponseEntity.status(HttpStatus.CREATED).body("Vehículo guardado exitosamente");
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Error al registrar vehículo: " + e.getMessage());
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
         }
     }
 
     @GetMapping("/byPlate/{plate}")
     public ResponseEntity<?> getByPlate(@RequestHeader("Authorization") String authHeader, @PathVariable String plate) {
         String token = authHeader.replace("Bearer ", "");
-        String email = jwtUtil.extractEmail(token);
-        String role = jwtUtil.extractUserRole(token);
 
-        if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role) ) {
-            try {
-                Vehicle v = vehicleService.getByPlate(plate.toUpperCase());
-                if (v == null) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Vehículo no encontrado");
+        try {
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
+
+            if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role)) {
+                try {
+                    Vehicle v = vehicleService.getByPlate(plate.toUpperCase());
+                    if (v == null) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Vehículo no encontrado");
+                    }
+                    return ResponseEntity.ok(v);
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Error al obtener vehículo: " + e.getMessage());
                 }
-                return ResponseEntity.ok(v);
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Error al obtener vehículo: " + e.getMessage());
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
         }
     }
 
     @GetMapping("/vehicles")
     public ResponseEntity<?> getVehicles(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
-        String email = jwtUtil.extractEmail(token);
-        String role = jwtUtil.extractUserRole(token);
 
-        if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role) ) {
-            try {
-                List<Vehicle> v = vehicleService.getVehicles(email);
-                if (v == null || v.isEmpty()) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No hay vehiculos registrados");
+        try {
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
+            
+            if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role)) {
+                try {
+                    List<Vehicle> v = vehicleService.getVehicles(email);
+                    if (v == null || v.isEmpty()) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No hay vehiculos registrados");
+                    }
+                    return ResponseEntity.ok(v);
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Error al obtener vehículo: " + e.getMessage());
                 }
-                return ResponseEntity.ok(v);
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Error al obtener vehículo: " + e.getMessage());
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
+
         }
     }
 
     @DeleteMapping("/byPlate/{plate}")
-    public ResponseEntity<?> deleteByPlate(@RequestHeader("Authorization") String authHeader, @PathVariable String plate) {
+    public ResponseEntity<?> deleteByPlate(@RequestHeader("Authorization") String authHeader,
+            @PathVariable String plate) {
         String token = authHeader.replace("Bearer ", "");
-        String email = jwtUtil.extractEmail(token);
-        String role = jwtUtil.extractUserRole(token);
+        try {
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
 
-        if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role) ) {
-            try {
-                Vehicle v = vehicleService.deleteByPlate(email,plate.toUpperCase());
-                if (v == null) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Vehículo no encontrado");
+            if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role)) {
+                try {
+                    Vehicle v = vehicleService.deleteByPlate(email, plate.toUpperCase());
+                    if (v == null) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Vehículo no encontrado");
+                    }
+                    return ResponseEntity.ok("Vehículo eliminado exitosamente");
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Error al obtener vehículo: " + e.getMessage());
                 }
-                return ResponseEntity.ok("Vehículo eliminado exitosamente");
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Error al obtener vehículo: " + e.getMessage());
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
         }
     }
 }
