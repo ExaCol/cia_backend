@@ -59,7 +59,7 @@ public class DataSeeder implements ApplicationRunner {
             Usr r = new Usr();
             r.setName("Admin");
             r.setIdentification("cc-1111111111");
-            r.setEmail("admin@gmail.com");
+            r.setEmail("admin@exa.co");
             r.setPassword(passwordEncoder.encode("Secreta123"));
             r.setLat(4.634269);
             r.setLon(-74.066388);
@@ -77,7 +77,7 @@ public class DataSeeder implements ApplicationRunner {
             Usr r = new Usr();
             r.setName("Empleado");
             r.setIdentification("cc-2222222222");
-            r.setEmail("empleado@gmail.com");
+            r.setEmail("empleado@exa.co");
             r.setPassword(passwordEncoder.encode("Secreta123"));
             r.setLat(4.634269);
             r.setLon(-74.066388);
@@ -166,11 +166,9 @@ public class DataSeeder implements ApplicationRunner {
             Integer end   = (Integer) r[2];
             int price     = (Integer) r[3];
 
-            // Si ya existe esa combinación, no duplica; si no existe, inserta.
             TECNORepository.findByTypeAndStartYearAndEndYear(type, start, end)
                 .ifPresentOrElse(
                     existing -> {
-                        // Si quisieras actualizar precio cuando cambie:
                         if (existing.getPrice() != price) {
                             existing.setPrice(price);
                             TECNORepository.save(existing);

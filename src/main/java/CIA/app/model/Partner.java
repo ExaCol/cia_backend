@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 //import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 //import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -56,7 +57,8 @@ public class Partner {
     //private Services service;
 
     @OneToMany(mappedBy = "partner")
-    @JsonBackReference(value="service-partner")
+    @JsonIgnore
+    //@JsonBackReference(value="service-partner")
     private List<Services> service;
 
     public Integer getId() {
