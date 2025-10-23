@@ -7,24 +7,22 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-//import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+
 import java.time.LocalDateTime;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
+import CIA.app.model.CoursesData;
 import CIA.app.model.Partner;
 import CIA.app.model.Services;
-//import CIA.app.model.Services;
 import CIA.app.model.Usr;
+import CIA.app.repositories.CoursesDataRepository;
+import CIA.app.repositories.PartnerRepository;
 import CIA.app.repositories.ServicesRepository;
-//import CIA.app.repositories.ServicesRepository;
 import CIA.app.repositories.UsrRepository;
 import lombok.extern.slf4j.Slf4j;
 import CIA.app.model.Token;
@@ -33,21 +31,32 @@ import CIA.app.repositories.TokenRepository;
 @Slf4j
 @Service
 public class UsrService {
+    
     @Autowired
-    private final UsrRepository usrRepository;
+    private UsrRepository usrRepository;
     @Autowired
     private final PasswordEncoder passwordEncoder;
     @Autowired
     private final ServicesRepository servicesRepository;
     @Autowired
+    private final CoursesDataRepository coursesDataRepository;
+    @Autowired
     private TokenRepository tokenRepository;
+    @Autowired
+    private PartnerRepository partnerRepository;
 
-    public UsrService(UsrRepository usrRepository, PasswordEncoder passwordEncoder, ServicesRepository servicesRepository, TokenRepository tokenRepository) {
+
+    public UsrService(UsrRepository usrRepository, PasswordEncoder passwordEncoder,
+            ServicesRepository servicesRepository, CoursesDataRepository coursesDataRepository,
+            TokenRepository tokenRepository, PartnerRepository partnerRepository) {
         this.usrRepository = usrRepository;
         this.passwordEncoder = passwordEncoder;
         this.servicesRepository = servicesRepository;
+        this.coursesDataRepository = coursesDataRepository;
         this.tokenRepository = tokenRepository;
+        this.partnerRepository = partnerRepository;
     }
+
 
     public Usr registUser(Usr user) {
         Usr existingUser = usrRepository.findByEmail(user.getEmail());
@@ -98,30 +107,125 @@ public class UsrService {
         return null;
     }
 
-    public List<Partner> getNearestPartner(String email, String type, double maxDistance){
+    /*public List<Partner> getNearestPartner(String email, String type, double maxDistance) {
         log.info("Variables: " + email + " " + type + " " + maxDistance);
         Usr user = findByEmail(email);
         if (user != null) {
-            Map<Integer, Partner> map = getPartnersByTypeServicesNR( type);
+            Map<Integer, Partner> map = getPartnersByTypeServicesNR(type);
 
-            //log.info("Mapa: " + map.toString());
-            for(Map.Entry<Integer, Partner> entry : map.entrySet()){
-                log.info("Entry: " + entry.getKey() + " - " + entry.getValue().getName().toString() + " - lat: " + entry.getValue().getLat() + " - lon " + entry.getValue().getLon());
+            // log.info("Mapa: " + map.toString());
+            for (Map.Entry<Integer, Partner> entry : map.entrySet()) {
+                log.info("Entry: " + entry.getKey() + " - " + entry.getValue().getName().toString() + " - lat: "
+                        + entry.getValue().getLat() + " - lon " + entry.getValue().getLon());
             }
 
-            if(map.isEmpty()) return null;
+            if (map.isEmpty())
+                return null;
             List<Partner> partners = new ArrayList<>(map.values());
 
             log.info("Lista: " + partners.toString());
-            for(Partner p : partners){
+            for (Partner p : partners) {
                 log.info("Partner: " + p.getName().toString() + " - lat: " + p.getLat() + " - lon " + p.getLon());
             }
 
             List<Partner> near = calculateDistance(user, partners, maxDistance);
-            
+
             log.info("Cercanos: " + near.toString());
             return near;
-            
+
+        }
+        return null;
+    }*/
+
+    public List<Partner>  getNearestPartner(String email, String type, double maxDistance){
+
+        Usr user = findByEmail(email);
+        List<Partner> partners = new ArrayList<>();
+
+        if(user != null){
+            partners = getPartnerByService(type);
+            if(partners == null || partners.isEmpty()){
+                return Collections.emptyList();
+            }
+            return calculateDistance(user, partners, maxDistance);
+        }
+
+        return Collections.emptyList();
+    }
+
+    public List<Partner> getPartnerByService(String type){
+        type = type.toUpperCase();
+        if(type.equals("SOAT")){
+            return partnerRepository.getPartnersBySoat();
+        } else if(type.equals("TECHNO")){
+            return partnerRepository.getPartnersByTechno();
+        }
+        return partnerRepository.getCIA();
+    }
+
+    private List<Partner> calculateDistance(Usr user, List<Partner> partners, double maxDistance) {
+        double userLat = user.getLat();
+        double userLon = user.getLon();
+
+        // return partners.stream()
+        //     // Acá se muestran los que no tengan alguna de los pares de las coordenadas
+        //     .peek(p -> {
+        //         if (p.getLat() == null || p.getLon() == null) {
+        //             log.warn("Partner sin coordenadas: id={}, nombre={}", p.getId(), p.getName());
+        //         }
+        //     })
+
+        //     // Acá se filtran los que tengan ambos pares de coordenadas
+        //     .filter(p -> p.getLat() != null && p.getLon() != null)
+
+        //     // Mapeo tipo <partner, distancia> y se calcula la distancia
+        //     .map(p -> {
+        //         double dist = approxToMeters(userLat, userLon, p.getLat(), p.getLon());
+        //         return new AbstractMap.SimpleEntry<>(p, dist);
+        //     })
+
+        //     // Acá se ve el partner ya con distancia calculada, sin ordenar ni filtrar
+        //     .peek(e -> log.info("Distancia a partner id={}, nombre={} -> {} m",
+        //             e.getKey().getId(), e.getKey().getName(), e.getValue()))
+
+        //     // Acá se filtran solo para los que sean menor o iguales a la distancia máxima
+        //     .filter(e -> e.getValue() <= maxDistance)
+
+        //     // Acá se ordenan de menor distancia a mayor distancia
+        //     .sorted(Comparator.comparingDouble(Map.Entry::getValue))
+
+        //     // Acá se muestran ya ordenados
+        //     .peek(e -> log.info("-------------> Ordenado: {} ({} m)", e.getKey().getName(), e.getValue()))
+
+        //     // Acá se hace el mapeo con respecto al partner
+        //     .map(Map.Entry::getKey)
+
+        //     .toList();
+
+        return partners.stream()
+            // Acá se filtran los que tengan ambos pares de coordenadas
+            .filter(partner -> partner.getLat() != null && partner.getLon() != null)
+            // Mapeo tipo <partner, distancia> y se calcula la distancia
+            .map(partner -> new AbstractMap.SimpleEntry<>(partner,
+                    approxToMeters(userLat, userLon, partner.getLat(), partner.getLon())))
+            // Acá se filtran solo para los que sean menor o iguales a la distancia máxima        
+            .filter(entry -> entry.getValue() <= maxDistance)
+            // Acá se ordenan de menor distancia a mayor distancia
+            .sorted(Comparator.comparingDouble(Map.Entry::getValue))
+            // Acá se hace el mapeo con respecto al partner
+            .map(Map.Entry::getKey)
+            .toList();
+
+    }
+
+    private static double approxToMeters(double lat1, double lon1, double lat2, double lon2) {
+        double ky = 111_320.0;
+        double kx = 111_320.0 * Math.cos(Math.toRadians((lat1 + lat2) / 2.0));
+        double dx = (lon2 - lon1) * kx;
+        double dy = (lat2 - lat1) * ky;
+        return Math.hypot(dx, dy);
+    }
+
     public String generarToken(String email) {
         int tokenInt = (int) (Math.random() * 900000) + 100000;
         String token = String.valueOf(tokenInt);
@@ -156,83 +260,29 @@ public class UsrService {
         return null;
     }
 
-    public Map<Integer, Partner> getPartnersByTypeServicesNR(String type){
-        
+    /*public Map<Integer, Partner> getPartnersByTypeServicesNR(String type) {
+
         List<Services> sR = servicesRepository.getServicesByType(type);
-            if(sR==null || sR.isEmpty()) return Collections.emptyMap();
+        if (sR == null || sR.isEmpty())
+            return Collections.emptyMap();
 
-            Map<Integer, Partner> partnersMapWR = new HashMap<>();
+        Map<Integer, Partner> partnersMapWR = new HashMap<>();
 
-            for(Services s : sR){
-                if (s.getPartner() == null) continue;
+        for (Services s : sR) {
+            if (s.getPartner() == null)
+                continue;
 
-                for (Partner p : s.getPartner()) {
-                    if (p == null || p.getId() == null) continue;
+            for (Partner p : s.getPartner()) {
+                if (p == null || p.getId() == null)
+                    continue;
 
-                    partnersMapWR.putIfAbsent(p.getId(), p);
-                }
+                partnersMapWR.putIfAbsent(p.getId(), p);
             }
+        }
 
-            return partnersMapWR;
-    }
+        return partnersMapWR;
+    }*/
 
-    private List<Partner> calculateDistance(Usr user, List<Partner> partners, double maxDistance) {
-        double userLat = user.getLat();
-        double userLon = user.getLon();
-
-        return partners.stream()
-            .filter(partner -> partner.getLat() != null && partner.getLon() != null)
-            .map(partner -> new AbstractMap.SimpleEntry<>(partner, approxToMeters(userLat, userLon, partner.getLat(), partner.getLon())))
-            .filter(entry -> entry.getValue() <= maxDistance)
-            .sorted(Comparator.comparingDouble(Map.Entry::getValue))
-            .map(Map.Entry::getKey)
-            .toList();
-
-        //log.info("calculateDistance: userLat={}, userLon={}, maxDistance={}", userLat, userLon, maxDistance);
-        //log.info("Partners recibidos: {}", partners.size());
-
-        // return partners.stream()
-        //     .peek(p -> log.info("IN -> id={} name={} lat={} lon={}",
-        //         p.getId(), p.getName(), p.getLat(), p.getLon()))
-        //     .filter(p -> {
-        //         boolean ok = p.getLat() != null && p.getLon() != null;
-        //         if (!ok) log.info("DESCARTE (coords nulas) -> id={} name={}", p.getId(), p.getName());
-        //         return ok;
-        //     })
-        //     .map(p -> new AbstractMap.SimpleEntry<>(
-        //         p, approxMetersBogota(userLat, userLon, p.getLat(), p.getLon())
-        //     ))
-        //     .peek(e -> log.info("DIST -> id={} name={} d≈{}m",
-        //         e.getKey().getId(), e.getKey().getName(), String.format("%.1f", e.getValue())))
-        //     .filter(e -> {
-        //         boolean ok = e.getValue() <= maxDistance;
-        //         if (!ok) log.info("FUERA_RADIO -> id={} name={} d={}m > {}m",
-        //                 e.getKey().getId(), e.getKey().getName(),
-        //                 String.format("%.1f", e.getValue()), String.format("%.1f", maxDistance));
-        //         return ok;
-        //     })
-
-        //     .sorted(Comparator.comparingDouble(Map.Entry::getValue))
-        //     .peek(new java.util.function.Consumer<Map.Entry<Partner, Double>>() {
-        //         int rank = 0;
-        //         @Override public void accept(Map.Entry<Partner, Double> e) {
-        //             log.info("RANK #{} -> id={} name={} d≈{}m",
-        //                     ++rank, e.getKey().getId(), e.getKey().getName(), String.format("%.1f", e.getValue()));
-        //         }
-        //     })
-
-        //     .map(Map.Entry::getKey)
-        //     .toList();
-        
-    }
-
-    private static double approxToMeters(double lat1, double lon1, double lat2, double lon2) {
-        double ky = 111_320.0;
-        double kx = 111_320.0 * Math.cos(Math.toRadians((lat1 + lat2) / 2.0));
-        double dx = (lon2 - lon1) * kx;
-        double dy = (lat2 - lat1) * ky;
-        return Math.hypot(dx, dy);
-      
     public Usr updatePassword(String email, String currentPassword, String newPassword) {
         Usr user = usrRepository.findByEmail(email);
         if (user != null) {
@@ -241,6 +291,71 @@ public class UsrService {
                 user.setPassword(hashedNewPassword);
                 return usrRepository.save(user);
             }
+        }
+        return null;
+    }
+
+    public List<CoursesData> getCoursesByUser(String email){
+        Usr user = usrRepository.findByEmail(email);
+        if (user != null) {
+            List<CoursesData> courses = coursesDataRepository.getCoursesByUser(user.getId());
+            if(courses != null && !courses.isEmpty()){
+                return courses;
+            }
+            return null;
+        }
+
+        return null;
+    }
+
+    public CoursesData registerUserToCourse(String email, CoursesData course){
+        Usr user = usrRepository.findByEmail(email);
+        if (user != null) {
+            CoursesData existingCourse = coursesDataRepository.findById(course.getId()).orElse(null);
+            if (existingCourse != null) {
+                boolean enrolled = user.getCourses().stream().anyMatch(c -> c.getId().equals(existingCourse.getId()));
+                if(!enrolled){
+                    if(existingCourse.getParcialCapacity() + 1 <= existingCourse.getCapacity()){
+                        existingCourse.setParcialCapacity(existingCourse.getParcialCapacity() + 1);
+                        user.getCourses().add(existingCourse);
+                        usrRepository.save(user);
+                        return existingCourse;
+                    }
+                    throw new IllegalStateException("Cupo lleno");
+                }
+                throw new IllegalStateException("Inscriba un curso diferente");
+            }
+            throw new IllegalStateException("Curso no encontrado");
+        }
+        return null;
+    }
+
+    public CoursesData deleteUserFromCourse(String email, CoursesData course){
+        Usr user = usrRepository.findByEmail(email);
+        if (user != null) {
+            CoursesData existingCourse = coursesDataRepository.findById(course.getId()).orElse(null);
+            if (existingCourse != null) {
+                boolean enrolled = user.getCourses().stream().anyMatch(c -> c.getId().equals(existingCourse.getId()));
+                if(enrolled){
+                    if(existingCourse.getParcialCapacity() -1 >= 0){
+                        existingCourse.setParcialCapacity(existingCourse.getParcialCapacity() -1);
+                        user.getCourses().removeIf(c -> c.getId().equals(existingCourse.getId()));
+                        usrRepository.save(user);
+                        return existingCourse;
+                    }
+                    throw new IllegalStateException("Error en capacidad parcial del curso");
+                }
+                throw new IllegalStateException("El usuario no está inscrito en ese curso");
+            }
+            throw new IllegalStateException("Curso no encontrado");
+        }
+        return null;
+    }
+
+    public List<CoursesData> getAllCourses(String email){
+        Usr usr = usrRepository.findByEmail(email);
+        if (usr != null) {
+            return coursesDataRepository.findAll();
         }
         return null;
     }

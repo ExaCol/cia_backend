@@ -34,7 +34,6 @@ public class VehicleController {
     }
 
     @PostMapping("/save")
-
     public ResponseEntity<?> saveVehicle(@RequestHeader("Authorization") String authHeader,
             @RequestBody Vehicle vehicle) {
         String token = authHeader.replace("Bearer ", "");
@@ -47,7 +46,7 @@ public class VehicleController {
                     Vehicle v = vehicleService.saveVehicle(email, vehicle);
                     if (v == null) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                .body("El vehículo ya está registrado o el usuario no existe");
+                                .body("El vehículo ya está registrado");
                     }
                     return ResponseEntity.status(HttpStatus.CREATED).body("Vehículo guardado exitosamente");
                 } catch (Exception e) {

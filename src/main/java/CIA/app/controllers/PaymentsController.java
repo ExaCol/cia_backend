@@ -74,7 +74,7 @@ public class PaymentsController {
             try {
                 paymentsService.getPaymentHistoryByUserId(email);
                  List<Payments> p = paymentsService.getPaymentHistoryByUserId(email);
-                if ( p== null) {
+                if ( p == null || p.isEmpty()) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se han realizado pagos");
                 }
                 return ResponseEntity.ok(p);

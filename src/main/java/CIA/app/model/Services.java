@@ -42,8 +42,9 @@ public class Services {
     @Column
     private int price;
 
-    @Column(name = "service_type")
+    @Column
     private String serviceType;
+
 
     @Column
     private String plate;
@@ -60,11 +61,15 @@ public class Services {
     @Column
     private LocalDate start_Date;
 
-    @Column
-    private Boolean graduated;
-    @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference(value = "service-partner")
-    private List<Partner> partner;
+    @Column(nullable = false)
+    private Boolean graduated = false;
+    
+
+
+    @ManyToOne
+    @JoinColumn(name = "partner_id")
+    @JsonBackReference(value="service-partner")
+    private Partner partner;
 
     @ManyToOne
     @JoinColumn(name = "payment_id")
@@ -87,8 +92,10 @@ public class Services {
         return price;
     }
 
-    public String getServiceType() {
+
+    public String getserviceType() {
         return serviceType;
+
     }
 
     public String getPlate() {
@@ -111,10 +118,6 @@ public class Services {
         return start_Date;
     }
 
-    public List<Partner> getPartner() {
-        return partner;
-    }
-
     public void setId(Integer id) {
         this.id = id;
     }
@@ -131,7 +134,8 @@ public class Services {
         this.price = price;
     }
 
-    public void setServiceType(String serviceType) {
+
+    public void setserviceType(String serviceType) {
         this.serviceType = serviceType;
     }
 
@@ -155,7 +159,19 @@ public class Services {
         this.start_Date = start_Date;
     }
 
-    public void setPartner(List<Partner> partner) {
+    public Boolean isGraduated() {
+        return graduated;
+    }
+
+    public void setGraduated(Boolean graduated) {
+        this.graduated = graduated;
+    }
+
+    public Partner getPartner() {
+        return partner;
+    }
+
+    public void setPartner(Partner partner) {
         this.partner = partner;
     }
 
@@ -166,13 +182,21 @@ public class Services {
     public void setPayment(Payments payment) {
         this.payment = payment;
     }
-  
-    public boolean isGraduated() {
+
+    public String getServiceType() {
+        return serviceType;
+    }
+
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
+    }
+
+    public Boolean getGraduated() {
         return graduated;
     }
 
-    public void setGraduated(boolean graduated) {
-        this.graduated = graduated;
-    }
 
+
+    
+    
 }

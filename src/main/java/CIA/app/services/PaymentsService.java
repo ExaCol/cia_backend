@@ -41,7 +41,7 @@ public class PaymentsService {
 
             List<Services> existing = servicesRepository.findAllById(ids);
             if (existing.size() != ids.size()) {
-                throw new IllegalArgumentException("Ingrese servicios válidos");
+                throw new IllegalStateException("Ingrese servicios válidos");
             }
 
             for(Services s: existing){
@@ -82,7 +82,7 @@ public class PaymentsService {
         if(usr != null){
             return paymentsRepository.findAllByUserServicesOrderByReleaseDateDesc(usr.getId());
         }
-        return List.of();
+        return null;
     }
 
 
@@ -100,7 +100,7 @@ public class PaymentsService {
     }
 
     public Double savedUsrMoney(){
-        return paymentsRepository.savedUsrMoney("SIMIT");
+        return paymentsRepository.savedUsrMoney("TICKET");
     }
 
     public Integer graduatedNum(){
