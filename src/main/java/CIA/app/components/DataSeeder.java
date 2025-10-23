@@ -31,27 +31,42 @@ public class DataSeeder implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        seedPartner();
+        seedPartners();
         seedAdmin();
         seedEmployee();
+        seedClient();
         seedsoatFaresOnce();
         seedTecnoFaresUpsert();
     }
 
-    private void seedPartner() {
-        if (!partnerRepository.existsById(1)) {
-            Partner r = new Partner();
-            r.setName("CIA");
-            r.setLat(4.1111111111111);
-            r.setLon(4.2222222222222);
-            r.setSoat(false);
-            r.setTechno(false);
+    private void seedPartners() {
+        //En la orden de esta inserción ya están ordenados con respecto a la distancia frente a las coordenadas del usuario
+        //Para facilidad de pruebas yo puse todos tieneen soat y techno, si quieren cambiarlo haganle pero desde el pgAdmin
+        if (partnerRepository.count() == 0) {
+            List<Partner> partners = List.of(
+                    createPartner("Punto SOAT Centro", 4.685, -74.118, true, true),
+                    createPartner("Centro Técnico Norte", 4.6854, -74.122, true, true),
+                    createPartner("Estación Técnico Centro", 4.6862, -74.119, true, true),
+                    createPartner("Sucursal Occidente", 4.6838, -74.130, true, true),
+                    createPartner("Punto SOAT Suba",         4.6976, -74.064, true, true),
+                    createPartner("Quiosco SOAT El Dorado",  4.6832, -74.204, true, true)
+                );
             try {
-                partnerRepository.saveAndFlush(r);
+                partnerRepository.saveAllAndFlush(partners);
             } catch (org.springframework.dao.DataIntegrityViolationException e) {
                 System.out.println("Data seeding failed: " + e.getMessage());
             }
         }
+    }
+
+    private Partner createPartner(String name, double lat, double lon, boolean soat, boolean techno) {
+        Partner p = new Partner();
+        p.setName(name);
+        p.setLat(lat);
+        p.setLon(lon);
+        p.setSoat(soat);
+        p.setTechno(techno);
+        return p;
     }
 
     private void seedAdmin(){
@@ -88,6 +103,25 @@ public class DataSeeder implements ApplicationRunner {
                 System.out.println("Data seeding failed: " + e.getMessage());
             }
         }
+    }
+
+    private void seedClient(){
+        if (!usrRepository.existsById(3)) {
+            Usr c = new Usr();
+            c.setName("Cliente #1");
+            c.setIdentification("1092837465");
+            c.setEmail("jdnova777@gmail.com");
+            c.setPassword(passwordEncoder.encode("Secreta123"));
+            c.setLat(4.5901991);
+            c.setLon(-74.1008003);
+            c.setRole("Cliente");
+            try {
+                usrRepository.saveAndFlush(c);
+            } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                System.out.println("Data seeding failed: " + e.getMessage());
+            }
+        }
+
     }
 
     private void seedsoatFaresOnce() {
