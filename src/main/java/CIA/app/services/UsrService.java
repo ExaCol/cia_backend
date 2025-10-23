@@ -141,14 +141,90 @@ public class UsrService {
 
         Usr user = findByEmail(email);
         List<Partner> partners = new ArrayList<>();
-        if(user == null){
-        partners = getPartnerByService(type);
-        if(partners == null || partners.isEmpty()){
-            return Collections.emptyList();
+
+        if(user != null){
+            partners = getPartnerByService(type);
+            if(partners == null || partners.isEmpty()){
+                return Collections.emptyList();
+            }
+            return calculateDistance(user, partners, maxDistance);
         }
+
+        return Collections.emptyList();
     }
 
-        return calculateDistance(user,partners, maxDistance);
+    public List<Partner> getPartnerByService(String type){
+        type = type.toUpperCase();
+        if(type.equals("SOAT")){
+            return partnerRepository.getPartnersBySoat();
+        } else if(type.equals("TECHNO")){
+            return partnerRepository.getPartnersByTechno();
+        }
+        return partnerRepository.getCIA();
+    }
+
+    private List<Partner> calculateDistance(Usr user, List<Partner> partners, double maxDistance) {
+        double userLat = user.getLat();
+        double userLon = user.getLon();
+
+        // return partners.stream()
+        //     // Acá se muestran los que no tengan alguna de los pares de las coordenadas
+        //     .peek(p -> {
+        //         if (p.getLat() == null || p.getLon() == null) {
+        //             log.warn("Partner sin coordenadas: id={}, nombre={}", p.getId(), p.getName());
+        //         }
+        //     })
+
+        //     // Acá se filtran los que tengan ambos pares de coordenadas
+        //     .filter(p -> p.getLat() != null && p.getLon() != null)
+
+        //     // Mapeo tipo <partner, distancia> y se calcula la distancia
+        //     .map(p -> {
+        //         double dist = approxToMeters(userLat, userLon, p.getLat(), p.getLon());
+        //         return new AbstractMap.SimpleEntry<>(p, dist);
+        //     })
+
+        //     // Acá se ve el partner ya con distancia calculada, sin ordenar ni filtrar
+        //     .peek(e -> log.info("Distancia a partner id={}, nombre={} -> {} m",
+        //             e.getKey().getId(), e.getKey().getName(), e.getValue()))
+
+        //     // Acá se filtran solo para los que sean menor o iguales a la distancia máxima
+        //     .filter(e -> e.getValue() <= maxDistance)
+
+        //     // Acá se ordenan de menor distancia a mayor distancia
+        //     .sorted(Comparator.comparingDouble(Map.Entry::getValue))
+
+        //     // Acá se muestran ya ordenados
+        //     .peek(e -> log.info("-------------> Ordenado: {} ({} m)", e.getKey().getName(), e.getValue()))
+
+        //     // Acá se hace el mapeo con respecto al partner
+        //     .map(Map.Entry::getKey)
+
+        //     .toList();
+
+        return partners.stream()
+            // Acá se filtran los que tengan ambos pares de coordenadas
+            .filter(partner -> partner.getLat() != null && partner.getLon() != null)
+            // Mapeo tipo <partner, distancia> y se calcula la distancia
+            .map(partner -> new AbstractMap.SimpleEntry<>(partner,
+                    approxToMeters(userLat, userLon, partner.getLat(), partner.getLon())))
+            // Acá se filtran solo para los que sean menor o iguales a la distancia máxima        
+            .filter(entry -> entry.getValue() <= maxDistance)
+            // Acá se ordenan de menor distancia a mayor distancia
+            .sorted(Comparator.comparingDouble(Map.Entry::getValue))
+            // Acá se hace el mapeo con respecto al partner
+            .map(Map.Entry::getKey)
+            .toList();
+
+    }
+
+    private static double approxToMeters(double lat1, double lon1, double lat2, double lon2) {
+        double ky = 111_320.0;
+        double kx = 111_320.0 * Math.cos(Math.toRadians((lat1 + lat2) / 2.0));
+        double dx = (lon2 - lon1) * kx;
+        double dy = (lat2 - lat1) * ky;
+        return Math.hypot(dx, dy);
+
     }
 
     public String generarToken(String email) {
@@ -204,7 +280,6 @@ public class UsrService {
                 partnersMapWR.putIfAbsent(p.getId(), p);
             }
         }
-
         return partnersMapWR;
     }*/
 
