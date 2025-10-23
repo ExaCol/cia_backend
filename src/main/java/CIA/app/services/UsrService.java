@@ -224,7 +224,6 @@ public class UsrService {
         double dx = (lon2 - lon1) * kx;
         double dy = (lat2 - lat1) * ky;
         return Math.hypot(dx, dy);
-
     }
 
     public String generarToken(String email) {
@@ -280,81 +279,9 @@ public class UsrService {
                 partnersMapWR.putIfAbsent(p.getId(), p);
             }
         }
+
         return partnersMapWR;
     }*/
-
-    public List<Partner> getPartnerByService(String type){
-        if(type.equals("SOAT")){
-            return partnerRepository.getPartnersBySoat();
-        }else if(type.equals("techno")){
-        return partnerRepository.getPartnersByTechno();
-    }
-    return partnerRepository.getCIA();
-    }
-
-
-    private List<Partner> calculateDistance(Usr user, List<Partner> partners, double maxDistance) {
-        double userLat = user.getLat();
-        double userLon = user.getLon();
-
-        return partners.stream()
-                .filter(partner -> partner.getLat() != null && partner.getLon() != null)
-                .map(partner -> new AbstractMap.SimpleEntry<>(partner,
-                        approxToMeters(userLat, userLon, partner.getLat(), partner.getLon())))
-                .filter(entry -> entry.getValue() <= maxDistance)
-                .sorted(Comparator.comparingDouble(Map.Entry::getValue))
-                .map(Map.Entry::getKey)
-                .toList();
-
-        // log.info("calculateDistance: userLat={}, userLon={}, maxDistance={}",
-        // userLat, userLon, maxDistance);
-        // log.info("Partners recibidos: {}", partners.size());
-
-        // return partners.stream()
-        // .peek(p -> log.info("IN -> id={} name={} lat={} lon={}",
-        // p.getId(), p.getName(), p.getLat(), p.getLon()))
-        // .filter(p -> {
-        // boolean ok = p.getLat() != null && p.getLon() != null;
-        // if (!ok) log.info("DESCARTE (coords nulas) -> id={} name={}", p.getId(),
-        // p.getName());
-        // return ok;
-        // })
-        // .map(p -> new AbstractMap.SimpleEntry<>(
-        // p, approxMetersBogota(userLat, userLon, p.getLat(), p.getLon())
-        // ))
-        // .peek(e -> log.info("DIST -> id={} name={} d≈{}m",
-        // e.getKey().getId(), e.getKey().getName(), String.format("%.1f",
-        // e.getValue())))
-        // .filter(e -> {
-        // boolean ok = e.getValue() <= maxDistance;
-        // if (!ok) log.info("FUERA_RADIO -> id={} name={} d={}m > {}m",
-        // e.getKey().getId(), e.getKey().getName(),
-        // String.format("%.1f", e.getValue()), String.format("%.1f", maxDistance));
-        // return ok;
-        // })
-
-        // .sorted(Comparator.comparingDouble(Map.Entry::getValue))
-        // .peek(new java.util.function.Consumer<Map.Entry<Partner, Double>>() {
-        // int rank = 0;
-        // @Override public void accept(Map.Entry<Partner, Double> e) {
-        // log.info("RANK #{} -> id={} name={} d≈{}m",
-        // ++rank, e.getKey().getId(), e.getKey().getName(), String.format("%.1f",
-        // e.getValue()));
-        // }
-        // })
-
-        // .map(Map.Entry::getKey)
-        // .toList();
-
-    }
-
-    private static double approxToMeters(double lat1, double lon1, double lat2, double lon2) {
-        double ky = 111_320.0;
-        double kx = 111_320.0 * Math.cos(Math.toRadians((lat1 + lat2) / 2.0));
-        double dx = (lon2 - lon1) * kx;
-        double dy = (lat2 - lat1) * ky;
-        return Math.hypot(dx, dy);
-    }
 
     public Usr updatePassword(String email, String currentPassword, String newPassword) {
         Usr user = usrRepository.findByEmail(email);
