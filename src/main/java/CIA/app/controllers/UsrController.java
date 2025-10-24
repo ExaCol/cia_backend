@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -81,6 +81,30 @@ public class UsrController {
         }
     }
 
+    @GetMapping("/userbyemail/{emailUser}")
+    public ResponseEntity<?> userByEmail(@RequestHeader("Authorization") String authHeader,
+            @PathVariable String emailUser) {
+        String token = authHeader.replace("Bearer ", "");
+        try {
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractUserRole(token);
+
+            if (jwtUtil.isTokenValid(token, email)
+                    && ("Cliente".equals(role) || "Admin".equals(role) || "Empleado".equals(role))) {
+                Usr userFound = usrService.findByEmail(emailUser.toLowerCase());
+                if (userFound != null) {
+                    return ResponseEntity.ok(userFound);
+                } else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");
+            }
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
+        }
+    }
+
     @PatchMapping("/user")
     public ResponseEntity<?> updateUser(@RequestHeader("Authorization") String authHeader, @RequestBody Usr user) {
         String token = authHeader.replace("Bearer ", "");
@@ -141,6 +165,7 @@ public class UsrController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Usr user) {
+        user.setEmail(user.getEmail().toLowerCase());
         Usr existingUser = usrService.findByEmail(user.getEmail());
         if (existingUser != null) {
             Usr u = usrService.login(user.getEmail(), user.getPassword());
@@ -245,7 +270,8 @@ public class UsrController {
     }
 
     @PostMapping("/registerCourse")
-    public ResponseEntity<?> registerUserToCourse(@RequestHeader("Authorization") String authHeader, @RequestBody CoursesData coursesData){
+    public ResponseEntity<?> registerUserToCourse(@RequestHeader("Authorization") String authHeader,
+            @RequestBody CoursesData coursesData) {
         String token = authHeader.replace("Bearer ", "");
         try {
             String email = jwtUtil.extractEmail(token);
@@ -300,7 +326,8 @@ public class UsrController {
     }
 
     @DeleteMapping("/deleteUserFromCourse")
-    public ResponseEntity<?> deleteUserFromCourse(@RequestHeader("Authorization") String authHeader, @RequestBody CoursesData coursesData){
+    public ResponseEntity<?> deleteUserFromCourse(@RequestHeader("Authorization") String authHeader,
+            @RequestBody CoursesData coursesData) {
         String token = authHeader.replace("Bearer ", "");
         try {
             String email = jwtUtil.extractEmail(token);
@@ -342,7 +369,8 @@ public class UsrController {
                     }
                     return ResponseEntity.ok(courses);
                 } catch (Exception e) {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al buscar los cursos: " + e.getMessage());
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Error al buscar los cursos: " + e.getMessage());
                 }
             } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: requiere rol válido");

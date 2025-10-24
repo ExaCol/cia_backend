@@ -59,11 +59,12 @@ public class UsrService {
 
 
     public Usr registUser(Usr user) {
-        Usr existingUser = usrRepository.findByEmail(user.getEmail());
+        Usr existingUser = usrRepository.findByEmail(user.getEmail().toLowerCase());
         Usr existingIdentification = usrRepository.findByIdentification(user.getIdentification());
         if (existingUser != null || existingIdentification != null) {
             return null;
         }
+        user.setEmail(user.getEmail().toLowerCase());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return usrRepository.save(user);
     }
