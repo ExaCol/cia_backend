@@ -44,7 +44,7 @@ public class CoursesDataController {
             String email = jwtUtil.extractEmail(token);
             String role = jwtUtil.extractUserRole(token);
 
-            if (jwtUtil.isTokenValid(token, email) && "Admin".equals(role)) {
+            if (jwtUtil.isTokenValid(token, email) && ("Admin".equals(role) || "Empleado".equals(role))) {
                 try {
                     CoursesData c = coursesDataService.createCourse(email, coursesData);
                     if (c == null) {
@@ -70,7 +70,7 @@ public class CoursesDataController {
             String email = jwtUtil.extractEmail(token);
             String role = jwtUtil.extractUserRole(token);
 
-            if (jwtUtil.isTokenValid(token, email) && ("Admin".equals(role) || "Cliente".equals(role))) {
+            if (jwtUtil.isTokenValid(token, email) && ("Admin".equals(role) || "Empleado".equals(role))) {
                 try {
                     List<Usr> users = coursesDataService.getUsersByCourse(email, courseId);
                     if (users == null || users.isEmpty()) {
@@ -95,7 +95,7 @@ public class CoursesDataController {
             String email = jwtUtil.extractEmail(token);
             String role = jwtUtil.extractUserRole(token);
 
-            if (jwtUtil.isTokenValid(token, email) && ("Admin".equals(role) || "Cliente".equals(role))) {
+            if (jwtUtil.isTokenValid(token, email) && ("Admin".equals(role) || "Empleado".equals(role))) {
                 try {
                     CoursesData course = coursesDataService.getSpeficifCourse(courseId);
                     if (course == null) {
@@ -120,7 +120,7 @@ public class CoursesDataController {
             String email = jwtUtil.extractEmail(token);
             String role = jwtUtil.extractUserRole(token);
 
-            if(jwtUtil.isTokenValid(token, email) && "Admin".equals(role)) {
+            if(jwtUtil.isTokenValid(token, email) && ("Admin".equals(role) || "Empleado".equals(role))) {
                 try {
                     CoursesData course = coursesDataService.deleteCourse(coursesData);
                     if (course == null) {
@@ -174,7 +174,7 @@ public class CoursesDataController {
             String email = jwtUtil.extractEmail(token);
             String role = jwtUtil.extractUserRole(token);
 
-            if (jwtUtil.isTokenValid(token, email) && ("Admin".equals(role) || "Cliente".equals(role))) {
+            if (jwtUtil.isTokenValid(token, email) && ("Admin".equals(role) || "Empleado".equals(role))) {
                 try {
                     List<CoursesData> courses = coursesDataService.getAllCourses(email);
                     if (courses == null || courses.isEmpty()) {
@@ -191,6 +191,4 @@ public class CoursesDataController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
         }
     }
-
-     
 }
