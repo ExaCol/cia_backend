@@ -4,10 +4,8 @@ import java.time.LocalDate;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import CIA.app.model.Usr;
 import CIA.app.model.Payments;
 import CIA.app.model.Services;
@@ -21,19 +19,20 @@ public class PaymentsService {
     private PaymentsRepository paymentsRepository;
     @Autowired
     private UsrService usrService;
-    @Autowired 
+    @Autowired
     private ServicesRepository servicesRepository;
 
-    public PaymentsService(PaymentsRepository paymentsRepository, UsrService usrService, ServicesRepository servicesRepository) {
+    public PaymentsService(PaymentsRepository paymentsRepository, UsrService usrService,
+            ServicesRepository servicesRepository) {
         this.paymentsRepository = paymentsRepository;
         this.usrService = usrService;
         this.servicesRepository = servicesRepository;
     }
-    
+
     public Payments createPayments(String email, Payments payment) {
         Usr user = usrService.findByEmail(email);
         if (user != null) {
-            
+
             List<Integer> ids = payment.getServices().stream().map(Services::getId).toList();
             if (ids.isEmpty()) {
                 throw new IllegalArgumentException("Debe enviar un pago con servicio/s asociado/s");
@@ -44,7 +43,7 @@ public class PaymentsService {
                 throw new IllegalStateException("Ingrese servicios válidos");
             }
 
-            for(Services s: existing){
+            for (Services s : existing) {
                 s.setPayment(payment);
             }
             payment.setServices(existing);
@@ -53,7 +52,7 @@ public class PaymentsService {
         return null;
     }
 
-    public List<Payments> getPaymentsByUser(String email){
+    public List<Payments> getPaymentsByUser(String email) {
         Usr user = usrService.findByEmail(email);
         if (user != null) {
             return paymentsRepository.getPaymentsByUser(user.getId());
@@ -61,15 +60,15 @@ public class PaymentsService {
         return null;
     }
 
-    public Payments getSpecificPayments(Integer paymentId){
+    public Payments getSpecificPayments(Integer paymentId) {
         Optional<Payments> p = paymentsRepository.findById(paymentId);
         return p.orElse(null);
     }
 
-    public Payments deleteEspecificPayments(Payments payment){
+    public Payments deleteEspecificPayments(Payments payment) {
 
         Payments p = getSpecificPayments(payment.getId());
-        if(p != null){
+        if (p != null) {
             paymentsRepository.delete(p);
             return p;
         }
@@ -77,34 +76,32 @@ public class PaymentsService {
         return null;
     }
 
-    public List<Payments> getPaymentHistoryByUserId(String email){
+    public List<Payments> getPaymentHistoryByUserId(String email) {
         Usr usr = usrService.findByEmail(email);
-        if(usr != null){
+        if (usr != null) {
             return paymentsRepository.findAllByUserServicesOrderByReleaseDateDesc(usr.getId());
         }
         return null;
     }
 
-
-    public int getPaymentNumber(LocalDate startDate, LocalDate endDate){
+    public int getPaymentNumber(LocalDate startDate, LocalDate endDate) {
         return paymentsRepository.findPaymentsNumBetweenDates(startDate, endDate);
 
     }
 
-    public Double earningsByCat(String type){
+    public Double earningsByCat(String type) {
         return paymentsRepository.earningsByCat(type);
     }
 
-    public Double getNetWorth(){
+    public Double getNetWorth() {
         return paymentsRepository.findTotalPaymentsAmount();
     }
 
-    public Double savedUsrMoney(){
+    public Double savedUsrMoney() {
         return paymentsRepository.savedUsrMoney("TICKET");
     }
 
-    public Integer graduatedNum(){
+    public Integer graduatedNum() {
         return paymentsRepository.graduatedUsr();
     }
 }
-

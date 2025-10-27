@@ -1,30 +1,16 @@
 package CIA.app.model;
 
 import java.util.List;
-
-//import java.time.LocalDate;
-//import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-//import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-//import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-//import jakarta.persistence.FetchType;
-//import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-//import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-
 
 @Entity
 @AllArgsConstructor
@@ -51,14 +37,8 @@ public class Partner {
     @Column
     private boolean techno;
 
-    //@ManyToOne
-    //@JoinColumn(name = "service_id")
-    //@JsonBackReference(value="service-partner")
-    //private Services service;
-
     @OneToMany(mappedBy = "partner")
     @JsonIgnore
-    //@JsonBackReference(value="service-partner")
     private List<Services> service;
 
     public Integer getId() {
@@ -76,8 +56,6 @@ public class Partner {
     public void setName(String name) {
         this.name = name;
     }
-
-    
 
     public Double getLat() {
         return lat;
@@ -118,7 +96,4 @@ public class Partner {
     public void setService(List<Services> service) {
         this.service = service;
     }
-
-    
-    
 }

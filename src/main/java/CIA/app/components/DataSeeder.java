@@ -2,12 +2,10 @@ package CIA.app.components;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
 import CIA.app.model.CoursesData;
 import CIA.app.model.Partner;
 import CIA.app.model.SOAT_FARE;
@@ -49,7 +47,7 @@ public class DataSeeder implements ApplicationRunner {
         if (!coursesDataRepository.findById(1).isPresent()) {
             CoursesData a1 = new CoursesData();
             a1.setName("Curso de Conducción");
-            a1.setParcialCapacity(10);
+            a1.setParcialCapacity(0);
             a1.setType("A1");
             a1.setPrice(450000);
             a1.setCapacity(25);
@@ -59,7 +57,7 @@ public class DataSeeder implements ApplicationRunner {
         if (!coursesDataRepository.findById(2).isPresent()) {
             CoursesData a2 = new CoursesData();
             a2.setName("Curso de Conducción");
-            a2.setParcialCapacity(10);
+            a2.setParcialCapacity(0);
             a2.setType("A2");
             a2.setPrice(820000);
             a2.setCapacity(25);
@@ -69,7 +67,7 @@ public class DataSeeder implements ApplicationRunner {
         if (!coursesDataRepository.findById(3).isPresent()) {
             CoursesData b1 = new CoursesData();
             b1.setName("Curso de Conducción");
-            b1.setParcialCapacity(10);
+            b1.setParcialCapacity(0);
             b1.setType("B1");
             b1.setPrice(1020000);
             b1.setCapacity(25);
@@ -79,7 +77,7 @@ public class DataSeeder implements ApplicationRunner {
         if (!coursesDataRepository.findById(4).isPresent()) {
             CoursesData b2 = new CoursesData();
             b2.setName("Curso de Conducción");
-            b2.setParcialCapacity(10);
+            b2.setParcialCapacity(0);
             b2.setType("B2");
             b2.setPrice(1450000);
             b2.setCapacity(25);
@@ -89,7 +87,7 @@ public class DataSeeder implements ApplicationRunner {
         if (!coursesDataRepository.findById(5).isPresent()) {
             CoursesData b3 = new CoursesData();
             b3.setName("Curso de Conducción");
-            b3.setParcialCapacity(10);
+            b3.setParcialCapacity(0);
             b3.setType("B3");
             b3.setPrice(2411703);
             b3.setCapacity(25);
@@ -99,7 +97,7 @@ public class DataSeeder implements ApplicationRunner {
         if (!coursesDataRepository.findById(6).isPresent()) {
             CoursesData c1 = new CoursesData();
             c1.setName("Curso de Conducción");
-            c1.setParcialCapacity(10);
+            c1.setParcialCapacity(0);
             c1.setType("C1");
             c1.setPrice(1230000);
             c1.setCapacity(25);
@@ -109,7 +107,7 @@ public class DataSeeder implements ApplicationRunner {
         if (!coursesDataRepository.findById(7).isPresent()) {
             CoursesData c2 = new CoursesData();
             c2.setName("Curso de Conducción");
-            c2.setParcialCapacity(10);
+            c2.setParcialCapacity(0);
             c2.setType("C2");
             c2.setPrice(1290000);
             c2.setCapacity(25);
@@ -119,7 +117,7 @@ public class DataSeeder implements ApplicationRunner {
         if (!coursesDataRepository.findById(8).isPresent()) {
             CoursesData c3 = new CoursesData();
             c3.setName("Curso de Conducción");
-            c3.setParcialCapacity(10);
+            c3.setParcialCapacity(0);
             c3.setType("C3");
             c3.setPrice(1500000);
             c3.setCapacity(25);
@@ -255,7 +253,6 @@ public class DataSeeder implements ApplicationRunner {
     }
 
     private void seedTecnoFaresUpsert() {
-        // Datos originales (tipo, inicio, fin, precio)
         Object[][] rows = new Object[][] {
                 { "Motos", 2023, 2025, 215541 },
                 { "Motos", 2018, 2022, 215841 },

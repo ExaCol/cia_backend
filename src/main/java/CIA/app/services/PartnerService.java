@@ -4,14 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import CIA.app.model.Partner;
-//import CIA.app.model.Payments;
 import CIA.app.model.Usr;
-import CIA.app.model.Services;
 import CIA.app.repositories.PartnerRepository;
 
 @Service
@@ -32,21 +27,6 @@ public class PartnerService {
     public Partner createPartner(String email, Partner partner) {
         Usr user = usrService.findByEmail(email);
         if (user != null) {
-
-            /*
-             * Integer partnerId = partner.getService().getId();
-             * if (partnerId.equals(null)) {
-             * throw new
-             * IllegalArgumentException("El partner debe tener un servicio asociado");
-             * }
-             * 
-             * Services existing = servicesService.getSpecificServices(partnerId);
-             * if (!partnerId.equals(existing.getId())){
-             * throw new IllegalStateException("Ingrese un servicio válido");
-             * }
-             * partner.setService(existing);
-             */
-
             return partnerRepository.save(partner);
         }
         return null;
@@ -69,13 +49,6 @@ public class PartnerService {
         }
         return partnerRepository.getCIA();
     }
-
-    // public List<Partner> getPartnersByServices(Integer serviceId){
-    // if (servicesService.getSpecificServices(serviceId) != null) {
-    // return partnerRepository.getPartnersByServices(serviceId);
-    // }
-    // return null;
-    // }
 
     public Partner deleteSpecificPartner(Integer partnerId) {
         {
@@ -103,5 +76,4 @@ public class PartnerService {
         }
         return null;
     }
-
 }

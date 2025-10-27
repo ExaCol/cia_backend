@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import CIA.app.model.CoursesData;
 
-public interface CoursesDataRepository extends JpaRepository<CoursesData, Integer>{
+public interface CoursesDataRepository extends JpaRepository<CoursesData, Integer> {
 
     @Query("""
             SELECT c

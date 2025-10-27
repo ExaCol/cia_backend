@@ -12,13 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import CIA.app.components.JwtUtil;
 import CIA.app.model.Vehicle;
 import CIA.app.services.VehicleService;
-
 import io.jsonwebtoken.ExpiredJwtException;
-
 
 @RestController
 @RequestMapping("/vehicle")
@@ -95,7 +92,7 @@ public class VehicleController {
         try {
             String email = jwtUtil.extractEmail(token);
             String role = jwtUtil.extractUserRole(token);
-            
+
             if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role)) {
                 try {
                     List<Vehicle> v = vehicleService.getVehicles(email);

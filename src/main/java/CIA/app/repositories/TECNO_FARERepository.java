@@ -1,10 +1,7 @@
 package CIA.app.repositories;
 
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import CIA.app.model.SOAT_FARE;
 import CIA.app.model.TECNO_FARE;
 
 public interface TECNO_FARERepository extends JpaRepository<TECNO_FARE, Integer>{
