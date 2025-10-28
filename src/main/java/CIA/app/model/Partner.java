@@ -1,26 +1,16 @@
 package CIA.app.model;
 
-//import java.time.LocalDate;
-//import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-//import com.fasterxml.jackson.annotation.JsonManagedReference;
-
-//import jakarta.persistence.CascadeType;
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-//import jakarta.persistence.FetchType;
-//import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-//import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-
 
 @Entity
 @AllArgsConstructor
@@ -36,10 +26,10 @@ public class Partner {
     private String name;
 
     @Column
-    private Long lat;
+    private Double lat;
 
     @Column
-    private Long lon;
+    private Double lon;
 
     @Column
     private boolean soat;
@@ -47,10 +37,9 @@ public class Partner {
     @Column
     private boolean techno;
 
-    @ManyToOne
-    @JoinColumn(name = "service_id")
-    @JsonBackReference(value="service-partner")
-    private Services service;
+    @OneToMany(mappedBy = "partner")
+    @JsonIgnore
+    private List<Services> service;
 
     public Integer getId() {
         return id;
@@ -68,19 +57,19 @@ public class Partner {
         this.name = name;
     }
 
-    public Long getLat() {
+    public Double getLat() {
         return lat;
     }
 
-    public void setLat(Long lat) {
+    public void setLat(Double lat) {
         this.lat = lat;
     }
 
-    public Long getLon() {
+    public Double getLon() {
         return lon;
     }
 
-    public void setLon(Long lon) {
+    public void setLon(Double lon) {
         this.lon = lon;
     }
 
@@ -100,12 +89,11 @@ public class Partner {
         this.techno = techno;
     }
 
-    public Services getService() {
+    public List<Services> getService() {
         return service;
     }
 
-    public void setService(Services service) {
+    public void setService(List<Services> service) {
         this.service = service;
     }
-    
 }

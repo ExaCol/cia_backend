@@ -1,9 +1,7 @@
 package CIA.app.model;
 
 import java.sql.Date;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,17 +31,17 @@ public class Vehicle {
     @Column
     private String soatRateType;
     @Column
-    private String technoClassification;
+    private int model;
     @Column
     @Temporal(TemporalType.DATE)
-    private Date soatExpiration; 
+    private Date soatExpiration;
     @Column
     @Temporal(TemporalType.DATE)
     private Date technoExpiration;
 
     @ManyToOne
     @JoinColumn(name = "usr_id")
-    @JsonBackReference(value="usr-vehicle")
+    @JsonBackReference(value = "usr-vehicle")
     private Usr usr;
 
     public Integer getId() {
@@ -78,14 +76,6 @@ public class Vehicle {
         this.soatRateType = soatRateType;
     }
 
-    public String getTechnoClassification() {
-        return technoClassification;
-    }
-
-    public void setTechnoClassification(String technoClassification) {
-        this.technoClassification = technoClassification;
-    }
-
     public Date getSoatExpiration() {
         return soatExpiration;
     }
@@ -108,5 +98,13 @@ public class Vehicle {
 
     public void setUsr(Usr usr) {
         this.usr = usr;
+    }
+
+    public int getModel() {
+        return model;
+    }
+
+    public void setModel(int model) {
+        this.model = model;
     }
 }

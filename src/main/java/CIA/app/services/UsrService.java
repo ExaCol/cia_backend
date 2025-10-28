@@ -1,39 +1,56 @@
 package CIA.app.services;
 
-import java.time.LocalDateTime;
-
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import java.time.LocalDateTime;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import CIA.app.model.Token;
+import CIA.app.model.CoursesData;
+import CIA.app.model.Partner;
 import CIA.app.model.Usr;
-import CIA.app.repositories.TokenRepository;
+import CIA.app.repositories.CoursesDataRepository;
+import CIA.app.repositories.PartnerRepository;
 import CIA.app.repositories.UsrRepository;
+import CIA.app.model.Token;
+import CIA.app.repositories.TokenRepository;
 
 @Service
 public class UsrService {
+
     @Autowired
     private UsrRepository usrRepository;
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private final CoursesDataRepository coursesDataRepository;
     @Autowired
     private TokenRepository tokenRepository;
+    @Autowired
+    private PartnerRepository partnerRepository;
 
-    public UsrService(UsrRepository usrRepository, PasswordEncoder passwordEncoder, TokenRepository tokenRepository) {
+    public UsrService(UsrRepository usrRepository, PasswordEncoder passwordEncoder, CoursesDataRepository coursesDataRepository,
+            TokenRepository tokenRepository, PartnerRepository partnerRepository) {
         this.usrRepository = usrRepository;
         this.passwordEncoder = passwordEncoder;
+        this.coursesDataRepository = coursesDataRepository;
         this.tokenRepository = tokenRepository;
+        this.partnerRepository = partnerRepository;
     }
 
     public Usr registUser(Usr user) {
-        Usr existingUser = usrRepository.findByEmail(user.getEmail());
+        Usr existingUser = usrRepository.findByEmail(user.getEmail().toLowerCase());
         Usr existingIdentification = usrRepository.findByIdentification(user.getIdentification());
         if (existingUser != null || existingIdentification != null) {
             return null;
         }
+        user.setEmail(user.getEmail().toLowerCase());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return usrRepository.save(user);
     }
@@ -75,6 +92,53 @@ public class UsrService {
             return usrRepository.save(user);
         }
         return null;
+    }
+
+    public List<Partner> getNearestPartner(String email, String type, double maxDistance) {
+
+        Usr user = findByEmail(email);
+        List<Partner> partners = new ArrayList<>();
+
+        if (user != null) {
+            partners = getPartnerByService(type);
+            if (partners == null || partners.isEmpty()) {
+                return Collections.emptyList();
+            }
+            return calculateDistance(user, partners, maxDistance);
+        }
+
+        return Collections.emptyList();
+    }
+
+    public List<Partner> getPartnerByService(String type) {
+        type = type.toUpperCase();
+        if (type.equals("SOAT")) {
+            return partnerRepository.getPartnersBySoat();
+        } else if (type.equals("TECHNO")) {
+            return partnerRepository.getPartnersByTechno();
+        }
+        return partnerRepository.getCIA();
+    }
+
+    private List<Partner> calculateDistance(Usr user, List<Partner> partners, double maxDistance) {
+        double userLat = user.getLat();
+        double userLon = user.getLon();
+        return partners.stream()
+                .filter(partner -> partner.getLat() != null && partner.getLon() != null)
+                .map(partner -> new AbstractMap.SimpleEntry<>(partner,
+                        approxToMeters(userLat, userLon, partner.getLat(), partner.getLon())))
+                .filter(entry -> entry.getValue() <= maxDistance)
+                .sorted(Comparator.comparingDouble(Map.Entry::getValue))
+                .map(Map.Entry::getKey)
+                .toList();
+    }
+
+    private static double approxToMeters(double lat1, double lon1, double lat2, double lon2) {
+        double ky = 111_320.0;
+        double kx = 111_320.0 * Math.cos(Math.toRadians((lat1 + lat2) / 2.0));
+        double dx = (lon2 - lon1) * kx;
+        double dy = (lat2 - lat1) * ky;
+        return Math.hypot(dx, dy);
     }
 
     public String generarToken(String email) {
@@ -119,6 +183,71 @@ public class UsrService {
                 user.setPassword(hashedNewPassword);
                 return usrRepository.save(user);
             }
+        }
+        return null;
+    }
+
+    public List<CoursesData> getCoursesByUser(String email) {
+        Usr user = usrRepository.findByEmail(email);
+        if (user != null) {
+            List<CoursesData> courses = coursesDataRepository.getCoursesByUser(user.getId());
+            if (courses != null && !courses.isEmpty()) {
+                return courses;
+            }
+            return null;
+        }
+
+        return null;
+    }
+
+    public CoursesData registerUserToCourse(String email, CoursesData course) {
+        Usr user = usrRepository.findByEmail(email);
+        if (user != null) {
+            CoursesData existingCourse = coursesDataRepository.findById(course.getId()).orElse(null);
+            if (existingCourse != null) {
+                boolean enrolled = user.getCourses().stream().anyMatch(c -> c.getId().equals(existingCourse.getId()));
+                if (!enrolled) {
+                    if (existingCourse.getParcialCapacity() + 1 <= existingCourse.getCapacity()) {
+                        existingCourse.setParcialCapacity(existingCourse.getParcialCapacity() + 1);
+                        user.getCourses().add(existingCourse);
+                        usrRepository.save(user);
+                        return existingCourse;
+                    }
+                    throw new IllegalStateException("Cupo lleno");
+                }
+                throw new IllegalStateException("Inscriba un curso diferente");
+            }
+            throw new IllegalStateException("Curso no encontrado");
+        }
+        return null;
+    }
+
+    public CoursesData deleteUserFromCourse(String email, CoursesData course) {
+        Usr user = usrRepository.findByEmail(email);
+        if (user != null) {
+            CoursesData existingCourse = coursesDataRepository.findById(course.getId()).orElse(null);
+            if (existingCourse != null) {
+                boolean enrolled = user.getCourses().stream().anyMatch(c -> c.getId().equals(existingCourse.getId()));
+                if (enrolled) {
+                    if (existingCourse.getParcialCapacity() - 1 >= 0) {
+                        existingCourse.setParcialCapacity(existingCourse.getParcialCapacity() - 1);
+                        user.getCourses().removeIf(c -> c.getId().equals(existingCourse.getId()));
+                        usrRepository.save(user);
+                        return existingCourse;
+                    }
+                    throw new IllegalStateException("Error en capacidad parcial del curso");
+                }
+                throw new IllegalStateException("El usuario no está inscrito en ese curso");
+            }
+            throw new IllegalStateException("Curso no encontrado");
+        }
+        return null;
+    }
+
+    public List<CoursesData> getAllCourses(String email) {
+        Usr usr = usrRepository.findByEmail(email);
+        if (usr != null) {
+            return coursesDataRepository.findAll();
         }
         return null;
     }

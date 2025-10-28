@@ -2,7 +2,6 @@ package CIA.app.components;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
 import CIA.app.services.ExpirationReminderService;
 
 @Component

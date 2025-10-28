@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
-
 import CIA.app.model.Usr;
 import CIA.app.model.Vehicle;
 import CIA.app.repositories.VehicleRepository;
@@ -30,7 +29,8 @@ public class ExpirationReminderService {
         LocalDate limit = today.plusMonths(1);
 
         List<Vehicle> expiring = vehicleRepository.findVehiclesExpiringBy(Date.valueOf(limit));
-        if (expiring.isEmpty()) return;
+        if (expiring.isEmpty())
+            return;
 
         Map<Usr, List<Vehicle>> byUser = expiring.stream()
                 .collect(Collectors.groupingBy(Vehicle::getUsr));
@@ -44,52 +44,56 @@ public class ExpirationReminderService {
     }
 
     private void sendEmail(Usr usr, List<Vehicle> vehicles, LocalDate today) {
-    final String destinatario = usr.getEmail();
-    if (!StringUtils.hasText(destinatario)) return;
+        final String destinatario = usr.getEmail();
+        if (!StringUtils.hasText(destinatario))
+            return;
 
-    final String asunto = "Recordatorio: vencimientos próximos de SOAT/Tecnomecánica";
-    final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        final String asunto = "Recordatorio: vencimientos próximos de SOAT/Tecnomecánica";
+        final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    StringBuilder sb = new StringBuilder();
-    sb.append("Hola ").append(safe(usr.getName() != null ? usr.getName() : "Usuario")).append(",\n\n");
-    sb.append("Estos vehículos tienen vencimientos próximos (≤ 1 mes):\n\n");
-    sb.append(String.format("%-10s %-10s %-30s %-30s %-15s%n",
-            " Placa", "     Tipo   ", "    SOAT (fecha y días)  ", "   Tecno (fecha y días)", "Tarifa SOAT"));
-    sb.append(String.format("%-10s %-10s %-30s %-30s %-15s%n",
-            " --------", "      -------- ", "    ------------------------------", "       ------------------------------", "      -----------"));
-
-    for (Vehicle v : vehicles) {
-        String soatFecha = "-";
-        String soatDias  = "-";
-        if (v.getSoatExpiration() != null) {
-            var f = v.getSoatExpiration().toLocalDate();
-            soatFecha = fmt.format(f);
-            long d = java.time.temporal.ChronoUnit.DAYS.between(today, f);
-            if (d >= 0) soatDias = d + " día(s)";
-        }
-
-        String tecnoFecha = "-";
-        String tecnoDias  = "-";
-        if (v.getTechnoExpiration() != null) {
-            var f = v.getTechnoExpiration().toLocalDate();
-            tecnoFecha = fmt.format(f);
-            long d = java.time.temporal.ChronoUnit.DAYS.between(today, f);
-            if (d >= 0) tecnoDias = d + " día(s)";
-        }
-
+        StringBuilder sb = new StringBuilder();
+        sb.append("Hola ").append(safe(usr.getName() != null ? usr.getName() : "Usuario")).append(",\n\n");
+        sb.append("Estos vehículos tienen vencimientos próximos (≤ 1 mes):\n\n");
         sb.append(String.format("%-10s %-10s %-30s %-30s %-15s%n",
-                safe(v.getPlate()),
-                safe(v.getType()),
-                soatFecha + " (" + soatDias + ")",
-                tecnoFecha + " (" + tecnoDias + ")",
-                "  " + safe(v.getSoatRateType())));
+                " Placa", "     Tipo   ", "    SOAT (fecha y días)  ", "   Tecno (fecha y días)", "Tarifa SOAT"));
+        sb.append(String.format("%-10s %-10s %-30s %-30s %-15s%n",
+                " --------", "      -------- ", "    ------------------------------",
+                "       ------------------------------", "      -----------"));
+
+        for (Vehicle v : vehicles) {
+            String soatFecha = "-";
+            String soatDias = "-";
+            if (v.getSoatExpiration() != null) {
+                var f = v.getSoatExpiration().toLocalDate();
+                soatFecha = fmt.format(f);
+                long d = java.time.temporal.ChronoUnit.DAYS.between(today, f);
+                if (d >= 0)
+                    soatDias = d + " día(s)";
+            }
+
+            String tecnoFecha = "-";
+            String tecnoDias = "-";
+            if (v.getTechnoExpiration() != null) {
+                var f = v.getTechnoExpiration().toLocalDate();
+                tecnoFecha = fmt.format(f);
+                long d = java.time.temporal.ChronoUnit.DAYS.between(today, f);
+                if (d >= 0)
+                    tecnoDias = d + " día(s)";
+            }
+
+            sb.append(String.format("%-10s %-10s %-30s %-30s %-15s%n",
+                    safe(v.getPlate()),
+                    safe(v.getType()),
+                    soatFecha + " (" + soatDias + ")",
+                    tecnoFecha + " (" + tecnoDias + ")",
+                    "  " + safe(v.getSoatRateType())));
+        }
+
+        sb.append("\nPor favor programa tu renovación con antelación.\n");
+        sb.append("— Equipo SmartTraffic\n");
+
+        emailService.enviarCorreo(destinatario, asunto, sb.toString());
     }
-
-    sb.append("\nPor favor programa tu renovación con antelación.\n");
-    sb.append("— Equipo SmartTraffic\n");
-
-    emailService.enviarCorreo(destinatario, asunto, sb.toString());
-}
 
     private String safe(String s) {
         return s == null ? "" : s;
