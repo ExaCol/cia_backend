@@ -1,6 +1,9 @@
 package CIA.app.controllers;
 
 import lombok.RequiredArgsConstructor;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,49 +20,54 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MercadoPagoWebhookController {
 
-    private final MercadoPagoService mpService;
+    private static final Logger log = LoggerFactory.getLogger(MercadoPagoWebhookController.class);
+  private final MercadoPagoService mpService;
 
-    @PostMapping("/webhook")
-    public ResponseEntity<String> webhook(@RequestParam Map<String, String> queryParams,
-            @RequestBody(required = false) Map<String, Object> body) {
-        // MP suele enviar: type=payment & id=<payment_id>
-        String type = queryParams.getOrDefault("type", queryParams.get("topic"));
-        String idStr = queryParams.get("id");
+  @PostMapping("/webhook")
+  public ResponseEntity<String> webhookPost(@RequestParam Map<String, String> qp,
+                                            @RequestBody(required = false) Map<String, Object> body) {
+    log.info("MP Webhook POST qp={}, body={}", qp, body);
+    return process(qp, body);
+  }
 
-        // Algunas veces viene en el body (según configuración)
-        if (idStr == null && body != null && body.get("data") instanceof Map<?, ?> data) {
-            Object oid = data.get("id");
-            if (oid != null)
-                idStr = String.valueOf(oid);
-        }
+  // Útil para probar manualmente desde el navegador/cURL
+  @GetMapping("/webhook")
+  public ResponseEntity<String> webhookGet(@RequestParam Map<String, String> qp) {
+    log.info("MP Webhook GET qp={}", qp);
+    return process(qp, null);
+  }
 
-        if (!"payment".equalsIgnoreCase(type) || idStr == null) {
-            return ResponseEntity.ok("ignored");
-        }
-
-        Long paymentId = Long.valueOf(idStr);
-
-        // Datos opcionales que a veces MP incluye en body
-        String extRef = null, status = null, statusDetail = null;
-        if (body != null) {
-            Object er = body.get("external_reference");
-            Object st = body.get("status");
-            Object sd = body.get("status_detail");
-            extRef = er != null ? er.toString() : null;
-            status = st != null ? st.toString() : null;
-            statusDetail = sd != null ? sd.toString() : null;
-        }
-
-        boolean approved = false;
-        try {
-            approved = mpService.confirmFromWebhook(paymentId, extRef, status, statusDetail);
-            // Aquí, si quieres, también puedes disparar lógica adicional a nivel
-            // controller.
-        } catch (Exception e) {
-            // No devuelvas 500; MP reintentará. Regresa 200 para cortar reintentos si tu
-            // servicio ya maneja idempotencia.
-            return ResponseEntity.ok("processed-with-error:" + e.getMessage());
-        }
-        return ResponseEntity.ok(approved ? "approved" : "ok");
+  private ResponseEntity<String> process(Map<String, String> qp, Map<String, Object> body) {
+    String type = qp.getOrDefault("type", qp.get("topic"));
+    String idStr = qp.get("id");
+    if (idStr == null && body != null && body.get("data") instanceof Map<?,?> data) {
+      Object oid = data.get("id");
+      if (oid != null) idStr = String.valueOf(oid);
     }
+
+    if (!"payment".equalsIgnoreCase(type) || idStr == null) {
+      log.warn("Ignorando notificación: type={}, id={}", type, idStr);
+      return ResponseEntity.ok("ignored");
+    }
+
+    Long paymentId = Long.valueOf(idStr);
+
+    String extRef = null, status = null, statusDetail = null;
+    if (body != null) {
+      Object er = body.get("external_reference");
+      Object st = body.get("status");
+      Object sd = body.get("status_detail");
+      extRef = er != null ? er.toString() : null;
+      status = st != null ? st.toString() : null;
+      statusDetail = sd != null ? sd.toString() : null;
+    }
+
+    try {
+      boolean approved = mpService.confirmFromWebhook(paymentId, extRef, status, statusDetail);
+      return ResponseEntity.ok(approved ? "approved" : "ok");
+    } catch (Exception e) {
+      // Responder 200 evita reintentos infinitos, tu lógica ya es idempotente
+      return ResponseEntity.ok("processed-with-error:" + e.getMessage());
+    }
+  }
 }

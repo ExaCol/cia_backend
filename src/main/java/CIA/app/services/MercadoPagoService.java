@@ -1,6 +1,8 @@
 package CIA.app.services;
 
 import java.math.BigDecimal;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,29 +72,40 @@ public class MercadoPagoService {
         metadata.put("serviceId", service.getId());
         metadata.put("usrId", currentUser.getId());
 
-        PreferenceRequest prefReq = PreferenceRequest.builder()
-                .items(List.of(item))
-                .externalReference(externalRef)
-                .backUrls(backUrls)
-                .notificationUrl(props.getNotificationUrl())
-                .autoReturn("approved")
-                .payer(payer)
-                .metadata(metadata)
-                .statementDescriptor("SmartTraffic")
-                .build();
+        try {
+            PreferenceRequest prefReq = PreferenceRequest.builder()
+                    .items(List.of(item))
+                    .externalReference(externalRef)
+                    .backUrls(backUrls)
+                    .notificationUrl(props.getNotificationUrl())
+                    //.autoReturn("approved")
+                    .payer(payer)
+                    .metadata(metadata)
+                    .statementDescriptor("SmartTraffic")
+                    .build();
 
-        var pref = new PreferenceClient().create(prefReq);
+            var pref = new PreferenceClient().create(prefReq);
 
-        // Pre-registrar pago pendiente con vínculo lógico
-        Payments pay = new Payments();
-        pay.setAmount(service.getPrice());
-        pay.setState("pending");
-        pay.setUsr(currentUser);
-        pay.setServiceId(service.getId()); // <<--- AQUÍ guardas el serviceId
-        pay.setExternalReference(externalRef);
-        paymentsRepo.save(pay);
+            // Pre-registrar pago pendiente con vínculo lógico
+            Payments pay = new Payments();
+            pay.setAmount(service.getPrice());
+            pay.setState("pending");
+            pay.setUsr(currentUser);
+            pay.setServiceId(service.getId()); // <<--- AQUÍ guardas el serviceId
+            pay.setExternalReference(externalRef);
+            pay.setReleaseDate(LocalDate.now());
+            paymentsRepo.save(pay);
 
-        return new CheckoutResponse(pref.getId(), pref.getInitPoint(), pref.getSandboxInitPoint());
+            return new CheckoutResponse(pref.getId(), pref.getInitPoint(), pref.getSandboxInitPoint());
+        } catch (MPApiException e) {
+            int status = e.getApiResponse().getStatusCode();
+            String body = e.getApiResponse().getContent();
+            System.err.println("[MP ERROR] status=" + status + " body=" + body);
+            throw new RuntimeException("MercadoPago API error: " + body);
+        } catch (MPException e) {
+            System.err.println("[MP ERROR] " + e.getMessage());
+            throw new RuntimeException("MercadoPago SDK error: " + e.getMessage());
+        }
     }
 
     @Transactional
@@ -129,6 +142,5 @@ public class MercadoPagoService {
     }
 
     private void postPaymentSuccess(Services service, Usr usr, Payments pay) {
-        // TODO: tu lógica adicional post-pago (enviar correo, habilitar curso, etc.)
     }
 }

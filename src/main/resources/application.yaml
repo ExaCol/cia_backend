@@ -31,9 +31,9 @@ spring:
           writetimeout: 60000    
   
 mercadopago:
-  access-token: "APP_USR-189f9ce9-d90a-4956-afdc-0f4a24f9e29e"  # tu token de PRUEBA
+  access-token: "APP_USR-3677142545763018-102808-b0d66c0b5bb678de301ae7d97c76dd6a-2951551977"  # tu token de PRUEBA
   base-url: https://api.mercadopago.com
   back-url-base: http://localhost:3000/pagos
-  notification-url: "https://a1b2c3d4.ngrok-free.app/api/payments/webhook"
+  notification-url: "https://hydrocyanic-porfirio-unevenly.ngrok-free.dev/api/payments/webhook"
 
 
