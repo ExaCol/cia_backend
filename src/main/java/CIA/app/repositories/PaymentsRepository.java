@@ -3,12 +3,14 @@ package CIA.app.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import CIA.app.model.Payments;
 
 public interface PaymentsRepository extends JpaRepository<Payments, Integer> {
-
+Optional<Payments> findByExternalReference(String externalReference);
         /*
     @Query("""
             select p

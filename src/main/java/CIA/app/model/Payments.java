@@ -31,14 +31,19 @@ public class Payments {
     @Column
     private String state;
 
+    @Column(name = "service_id", nullable = false) // <-- vínculo lógico
+    private Integer serviceId;
+
     @ManyToOne
     @JsonBackReference(value = "payment-services")
     private Usr usr;
 
-    @ManyToOne
-    @JoinColumn(name = "payment_id")
-    @JsonBackReference(value = "payments-usr")
-    private Payments payment;
+    // Datos de MP
+  @Column(unique = true)
+  private String externalReference; // ej: svc-<serviceId>-<uuid>
+
+  private Long mpPaymentId;
+  private String mpStatusDetail;
 
     public Integer getId() {
         return id;
@@ -80,12 +85,37 @@ public class Payments {
         this.usr = usr;
     }
 
-    public Payments getPayment() {
-        return payment;
+    public Integer getServiceId() {
+        return serviceId;
     }
 
-    public void setPayment(Payments payment) {
-        this.payment = payment;
+    public void setServiceId(Integer serviceId) {
+        this.serviceId = serviceId;
     }
 
+    public String getExternalReference() {
+        return externalReference;
+    }
+
+    public void setExternalReference(String externalReference) {
+        this.externalReference = externalReference;
+    }
+
+    public Long getMpPaymentId() {
+        return mpPaymentId;
+    }
+
+    public void setMpPaymentId(Long mpPaymentId) {
+        this.mpPaymentId = mpPaymentId;
+    }
+
+    public String getMpStatusDetail() {
+        return mpStatusDetail;
+    }
+
+    public void setMpStatusDetail(String mpStatusDetail) {
+        this.mpStatusDetail = mpStatusDetail;
+    }
+
+    
 }
