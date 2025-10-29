@@ -1,8 +1,6 @@
 package CIA.app.model;
 
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
@@ -15,9 +13,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -49,7 +47,8 @@ public class Usr {
     private List<Vehicle> vehicles;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "courses_usr", joinColumns = @JoinColumn(name = "usrId"), inverseJoinColumns = @JoinColumn(name = "courseId"))
+    @JoinTable(name = "courses_usr", joinColumns = @JoinColumn(name = "usrId"), inverseJoinColumns = @JoinColumn(name = "courseId"), uniqueConstraints = @UniqueConstraint(columnNames = {
+            "usrId", "courseId" }))
     private List<CoursesData> courses;
 
     @OneToMany(mappedBy = "usr", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -58,7 +57,7 @@ public class Usr {
 
     @OneToMany(mappedBy = "usr", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List <Payments> payments;
+    private List<Payments> payments;
 
     public Integer getId() {
         return id;
@@ -146,5 +145,13 @@ public class Usr {
 
     public void setServices(List<Services> services) {
         this.services = services;
+    }
+
+    public List<Payments> getPayments() {
+        return payments;
+    }
+
+    public void setPayments(List<Payments> payments) {
+        this.payments = payments;
     }
 }

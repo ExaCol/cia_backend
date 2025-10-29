@@ -15,13 +15,10 @@ public class PartnerService {
     private final PartnerRepository partnerRepository;
     @Autowired
     private final UsrService usrService;
-    @Autowired
-    private final ServicesService servicesService;
 
-    public PartnerService(PartnerRepository partnerRepository, UsrService usrService, ServicesService servicesService) {
+    public PartnerService(PartnerRepository partnerRepository, UsrService usrService) {
         this.partnerRepository = partnerRepository;
         this.usrService = usrService;
-        this.servicesService = servicesService;
     }
 
     public Partner createPartner(String email, Partner partner) {

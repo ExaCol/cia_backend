@@ -7,7 +7,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -31,19 +30,18 @@ public class Payments {
     @Column
     private String state;
 
-    @Column(name = "service_id", nullable = false) // <-- vínculo lógico
+    @Column(name = "service_id", nullable = false) 
     private Integer serviceId;
 
     @ManyToOne
     @JsonBackReference(value = "payment-services")
     private Usr usr;
 
-    // Datos de MP
-  @Column(unique = true)
-  private String externalReference; // ej: svc-<serviceId>-<uuid>
+    @Column(unique = true)
+    private String externalReference; 
 
-  private Long mpPaymentId;
-  private String mpStatusDetail;
+    private Long mpPaymentId;
+    private String mpStatusDetail;
 
     public Integer getId() {
         return id;
@@ -116,6 +114,4 @@ public class Payments {
     public void setMpStatusDetail(String mpStatusDetail) {
         this.mpStatusDetail = mpStatusDetail;
     }
-
-    
 }

@@ -11,26 +11,21 @@ import CIA.app.services.MercadoPagoService;
 
 import java.util.Map;
 
-/**
- * Debe quedar público (sin JWT) para recibir notificaciones de Mercado Pago.
- * Recibe: POST /api/payments/webhook?type=payment&id=<payment_id>
- */
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor
 public class MercadoPagoWebhookController {
 
-    private static final Logger log = LoggerFactory.getLogger(MercadoPagoWebhookController.class);
+  private static final Logger log = LoggerFactory.getLogger(MercadoPagoWebhookController.class);
   private final MercadoPagoService mpService;
 
   @PostMapping("/webhook")
   public ResponseEntity<String> webhookPost(@RequestParam Map<String, String> qp,
-                                            @RequestBody(required = false) Map<String, Object> body) {
+      @RequestBody(required = false) Map<String, Object> body) {
     log.info("MP Webhook POST qp={}, body={}", qp, body);
     return process(qp, body);
   }
 
-  // Útil para probar manualmente desde el navegador/cURL
   @GetMapping("/webhook")
   public ResponseEntity<String> webhookGet(@RequestParam Map<String, String> qp) {
     log.info("MP Webhook GET qp={}", qp);
@@ -40,9 +35,10 @@ public class MercadoPagoWebhookController {
   private ResponseEntity<String> process(Map<String, String> qp, Map<String, Object> body) {
     String type = qp.getOrDefault("type", qp.get("topic"));
     String idStr = qp.get("id");
-    if (idStr == null && body != null && body.get("data") instanceof Map<?,?> data) {
+    if (idStr == null && body != null && body.get("data") instanceof Map<?, ?> data) {
       Object oid = data.get("id");
-      if (oid != null) idStr = String.valueOf(oid);
+      if (oid != null)
+        idStr = String.valueOf(oid);
     }
 
     if (!"payment".equalsIgnoreCase(type) || idStr == null) {

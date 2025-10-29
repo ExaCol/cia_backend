@@ -26,4 +26,11 @@ public interface CoursesDataRepository extends JpaRepository<CoursesData, Intege
         WHERE c.type = :courseType
     """)
     int priceByCourseType(@PathVariable("courseType") String courseType);
+
+    @Query("""
+        SELECT c.id
+        FROM CoursesData c
+        WHERE c.type = :courseType
+    """)
+    int idByCourseType(@PathVariable("courseType") String courseType);
 }

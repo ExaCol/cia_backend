@@ -149,7 +149,8 @@ public class DataSeeder implements ApplicationRunner {
                     createPartner("Estación Técnico Centro", 4.6862, -74.119, true, true),
                     createPartner("Sucursal Occidente", 4.6838, -74.130, true, true),
                     createPartner("Punto SOAT Suba", 4.6976, -74.064, true, true),
-                    createPartner("Quiosco SOAT El Dorado", 4.6832, -74.204, true, true));
+                    createPartner("Quiosco SOAT El Dorado", 4.6832, -74.204, true, true),
+                    createPartner("CIA", 4.64594945, -74.0776053940335, false, false));
             try {
                 partnerRepository.saveAllAndFlush(partners);
             } catch (org.springframework.dao.DataIntegrityViolationException e) {
@@ -207,7 +208,7 @@ public class DataSeeder implements ApplicationRunner {
     private void seedClient() {
         if (!usrRepository.existsById(3)) {
             Usr c = new Usr();
-            c.setName("Cliente #1");
+            c.setName("Juliamcito Pekka");
             c.setIdentification("1092837465");
             c.setEmail("jdnova777@gmail.com");
             c.setPassword(passwordEncoder.encode("Secreta123"));

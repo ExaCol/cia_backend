@@ -11,7 +11,6 @@ public class MercadoPagoProperties {
     private String backUrlBase;
     private String notificationUrl;
 
-    // getters/setters
     public String getAccessToken() {
         return accessToken;
     }

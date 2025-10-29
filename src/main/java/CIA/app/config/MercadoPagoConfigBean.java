@@ -15,7 +15,6 @@ public class MercadoPagoConfigBean {
 
     @PostConstruct
     public void init() {
-        // token de PRUEBA => modo sandbox
         MercadoPagoConfig.setAccessToken(props.getAccessToken());
     }
 }

@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 import CIA.app.model.Services;
 
 public interface ServicesRepository extends JpaRepository<Services, Integer>{
-
     @Query("""
            select s
            from Services s

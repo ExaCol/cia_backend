@@ -118,13 +118,11 @@ public class CoursesDataService {
             if (!alreadyEnrolled) {
                 return null;
             }
-
             userOpt.getCourses().remove(courseOpt);
             usrRepository.save(userOpt);
             courseOpt.setParcialCapacity(courseOpt.getParcialCapacity() - 1);
             coursesDataRepository.save(courseOpt);
             return "Cliente desinscrito de curso exitosamente";
-
         }
         return null;
     }

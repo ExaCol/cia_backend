@@ -2,7 +2,7 @@ package CIA.app.dtos;
 
 public class CheckoutResponse {
     private String preferenceId;
-    private String initPoint; // URL para redirigir al checkout de MP
+    private String initPoint;
     private String sandboxInitPoint;
 
     public CheckoutResponse() {
