@@ -1,7 +1,6 @@
 package CIA.app.model;
 
 import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -14,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "loginAttempts")
 public class LoginAttempt {
-    @Id 
+    @Id
     private String email;
     @Column
     private int attempts;
@@ -28,30 +27,39 @@ public class LoginAttempt {
     public String getEmail() {
         return email;
     }
+
     public void setEmail(String email) {
         this.email = email;
     }
+
     public int getAttempts() {
         return attempts;
     }
+
     public void setAttempts(int attempts) {
         this.attempts = attempts;
     }
+
     public LocalDateTime getLastAttempt() {
         return lastAttempt;
     }
+
     public void setLastAttempt(LocalDateTime lastAttempt) {
         this.lastAttempt = lastAttempt;
     }
+
     public boolean isLocked() {
         return locked;
     }
+
     public void setLocked(boolean locked) {
         this.locked = locked;
     }
+
     public LocalDateTime getLockTime() {
         return lockTime;
     }
+
     public void setLockTime(LocalDateTime lockTime) {
         this.lockTime = lockTime;
     }

@@ -1,7 +1,5 @@
 package CIA.app.model;
 
-import java.sql.Date;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,10 +22,4 @@ public class TECNO_FARE {
     private Integer startYear;
     private Integer endYear;
     private int price;
-
-    
-
-
-
-    
 }

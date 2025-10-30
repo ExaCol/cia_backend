@@ -1,10 +1,9 @@
 package CIA.app.services;
 
+import java.sql.Date;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import CIA.app.model.Usr;
 import CIA.app.model.Vehicle;
 import CIA.app.repositories.VehicleRepository;
@@ -48,6 +47,16 @@ public class VehicleService {
         if (vehicle != null) {
             vehicleRepository.delete(vehicle);
             return vehicle;
+        }
+        return null;
+    }
+
+    public Vehicle update(Integer id, Date soatExpiration, Date technoExpiration) {
+        Vehicle vehicle = vehicleRepository.findById(id).orElse(null);
+        if (vehicle != null) {
+            vehicle.setSoatExpiration(soatExpiration);
+            vehicle.setTechnoExpiration(technoExpiration);
+            return vehicleRepository.save(vehicle);
         }
         return null;
     }

@@ -3,10 +3,8 @@ package CIA.app.components;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import CIA.app.model.LoginAttempt;
 import CIA.app.repositories.LoginAttemptRepository;
 

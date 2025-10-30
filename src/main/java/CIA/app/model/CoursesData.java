@@ -1,11 +1,6 @@
 package CIA.app.model;
 
 import java.util.List;
-
-//import com.fasterxml.jackson.annotation.JsonBackReference;
-//import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-//import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -20,7 +15,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Table(name = "courses_data")
 public class CoursesData {
 
@@ -39,7 +33,7 @@ public class CoursesData {
     private String type;
 
     @Column
-    private double price;
+    private int price;
     
     @Column
     private int capacity;
@@ -47,6 +41,12 @@ public class CoursesData {
     @ManyToMany(mappedBy = "courses", fetch = FetchType.LAZY)
     @com.fasterxml.jackson.annotation.JsonIgnore
     private List<Usr> usrs;
+
+    @Column
+    private boolean onQueue = false;
+
+    @Column
+    private boolean isFull = false;
 
     public Integer getId() {
         return id;
@@ -96,14 +96,28 @@ public class CoursesData {
         this.type = type;
     }
 
-    public double getPrice() {
+    public int getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(int price) {
         this.price = price;
     }
-    
-    
-    
+
+    public boolean isOnQueue() {
+        return onQueue;
+    }
+
+    public void setOnQueue(boolean onQueue) {
+        this.onQueue = onQueue;
+    }
+
+    public boolean isFull() {
+        return isFull;
+    }
+
+    public void setFull(boolean isFull) {
+        this.isFull = isFull;
+    }
+
 }

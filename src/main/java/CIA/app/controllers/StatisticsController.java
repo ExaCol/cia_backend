@@ -6,14 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import CIA.app.components.JwtUtil;
 import CIA.app.services.PaymentsService;
 import CIA.app.services.ServicesService;
 import CIA.app.services.UsrService;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.micrometer.core.ipc.http.HttpSender.Response;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -99,9 +96,9 @@ public class StatisticsController {
             String role = jwtUtil.extractUserRole(token);
 
             if (jwtUtil.isTokenValid(token, email) && ("Admin".equals(role))) {
-                
+
                 Double num = paymentsService.getNetWorth();
-            
+
                 if (num != null) {
                     num = num * 0.2;
                     return ResponseEntity.ok("la ganancia neta es de: " + num);
@@ -174,7 +171,7 @@ public class StatisticsController {
 
             if (jwtUtil.isTokenValid(token, email) && ("Admin".equals(role))) {
                 Integer num = paymentsService.graduatedNum();
-                if (num>0) {
+                if (num > 0) {
                     return ResponseEntity.ok("el numero de nuevos conductores es: " + num);
                 } else {
                     return ResponseEntity.badRequest().body("No se encontraron nuevos conductores");

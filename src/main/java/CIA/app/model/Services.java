@@ -1,23 +1,14 @@
 package CIA.app.model;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
-//import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
-import jakarta.persistence.CascadeType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-//import jakarta.persistence.FetchType;
-//import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -34,129 +25,72 @@ public class Services {
     @Column
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "usr_id", nullable = false)
-    @com.fasterxml.jackson.annotation.JsonIgnore
-    private Usr usr;
-
     @Column
     private int price;
 
     @Column
     private String serviceType;
 
+    @Column
+    private String courseType;
 
     @Column
     private String plate;
 
-    @Column
-    private LocalDate exp_date;
-
-    @Column
-    private String assurance;
-
-    @Column
-    private String duration;
-
-    @Column
-    private LocalDate start_Date;
+    @Column(nullable = false)
+    private boolean paid = false;
 
     @Column(nullable = false)
     private Boolean graduated = false;
-    
-
 
     @ManyToOne
     @JoinColumn(name = "partner_id")
-    @JsonBackReference(value="service-partner")
+    @JsonBackReference(value = "service-partner")
     private Partner partner;
 
     @ManyToOne
-    @JoinColumn(name = "payment_id")
-    @JsonBackReference(value="payment-services")
-    private Payments payment;
+    @JoinColumn(name = "usr_id", nullable = false)
+    @JsonIgnore
+    private Usr usr;
 
     public Integer getId() {
         return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Usr getUsr() {
-        return usr;
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-
-    public String getserviceType() {
-        return serviceType;
-
-    }
-
-    public String getPlate() {
-        return plate;
-    }
-
-    public LocalDate getExp_date() {
-        return exp_date;
-    }
-
-    public String getAssurance() {
-        return assurance;
-    }
-
-    public String getDuration() {
-        return duration;
-    }
-
-    public LocalDate getStart_Date() {
-        return start_Date;
     }
 
     public void setId(Integer id) {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setUsr(Usr usr) {
-        this.usr = usr;
+    public int getPrice() {
+        return price;
     }
 
     public void setPrice(int price) {
         this.price = price;
     }
 
+    public String getServiceType() {
+        return serviceType;
+    }
 
-    public void setserviceType(String serviceType) {
+    public void setServiceType(String serviceType) {
         this.serviceType = serviceType;
+    }
+
+    public String getPlate() {
+        return plate;
     }
 
     public void setPlate(String plate) {
         this.plate = plate;
-    }
-
-    public void setExp_date(LocalDate exp_date) {
-        this.exp_date = exp_date;
-    }
-
-    public void setAssurance(String assurance) {
-        this.assurance = assurance;
-    }
-
-    public void setDuration(String duration) {
-        this.duration = duration;
-    }
-
-    public void setStart_Date(LocalDate start_Date) {
-        this.start_Date = start_Date;
     }
 
     public Boolean isGraduated() {
@@ -175,28 +109,27 @@ public class Services {
         this.partner = partner;
     }
 
-    public Payments getPayment() {
-        return payment;
+    public Usr getUsr() {
+        return usr;
     }
 
-    public void setPayment(Payments payment) {
-        this.payment = payment;
+    public void setUsr(Usr usr) {
+        this.usr = usr;
     }
 
-    public String getServiceType() {
-        return serviceType;
+    public boolean isPaid() {
+        return paid;
     }
 
-    public void setServiceType(String serviceType) {
-        this.serviceType = serviceType;
+    public void setPaid(boolean paid) {
+        this.paid = paid;
     }
 
-    public Boolean getGraduated() {
-        return graduated;
+    public String getCourseType() {
+        return courseType;
     }
 
-
-
-    
-    
+    public void setCourseType(String courseType) {
+        this.courseType = courseType;
+    }
 }
