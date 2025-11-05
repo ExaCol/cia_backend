@@ -15,13 +15,10 @@ public class PartnerService {
     private final PartnerRepository partnerRepository;
     @Autowired
     private final UsrService usrService;
-    @Autowired
-    private final ServicesService servicesService;
 
-    public PartnerService(PartnerRepository partnerRepository, UsrService usrService, ServicesService servicesService) {
+    public PartnerService(PartnerRepository partnerRepository, UsrService usrService) {
         this.partnerRepository = partnerRepository;
         this.usrService = usrService;
-        this.servicesService = servicesService;
     }
 
     public Partner createPartner(String email, Partner partner) {
@@ -42,9 +39,10 @@ public class PartnerService {
     }
 
     public List<Partner> getPartnerByService(String type) {
+        type = type.toUpperCase();
         if (type.equals("SOAT")) {
             return partnerRepository.getPartnersBySoat();
-        } else if (type.equals("techno")) {
+        } else if (type.equals("TECNO")) {
             return partnerRepository.getPartnersByTechno();
         }
         return partnerRepository.getCIA();

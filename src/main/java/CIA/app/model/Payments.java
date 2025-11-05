@@ -1,15 +1,13 @@
 package CIA.app.model;
 
 import java.time.LocalDate;
-import java.util.List;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.CascadeType;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -32,9 +30,18 @@ public class Payments {
     @Column
     private String state;
 
-    @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference(value = "payment-services")
-    private List<Services> services;
+    @Column(name = "service_id", nullable = false) 
+    private Integer serviceId;
+
+    @ManyToOne
+    @JsonBackReference(value = "payment-services")
+    private Usr usr;
+
+    @Column(unique = true)
+    private String externalReference; 
+
+    private Long mpPaymentId;
+    private String mpStatusDetail;
 
     public Integer getId() {
         return id;
@@ -44,11 +51,11 @@ public class Payments {
         this.id = id;
     }
 
-    public LocalDate getreleaseDate() {
+    public LocalDate getReleaseDate() {
         return releaseDate;
     }
 
-    public void setreleaseDate(LocalDate releaseDate) {
+    public void setReleaseDate(LocalDate releaseDate) {
         this.releaseDate = releaseDate;
     }
 
@@ -68,11 +75,43 @@ public class Payments {
         this.state = state;
     }
 
-    public List<Services> getServices() {
-        return services;
+    public Usr getUsr() {
+        return usr;
     }
 
-    public void setServices(List<Services> services) {
-        this.services = services;
+    public void setUsr(Usr usr) {
+        this.usr = usr;
+    }
+
+    public Integer getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(Integer serviceId) {
+        this.serviceId = serviceId;
+    }
+
+    public String getExternalReference() {
+        return externalReference;
+    }
+
+    public void setExternalReference(String externalReference) {
+        this.externalReference = externalReference;
+    }
+
+    public Long getMpPaymentId() {
+        return mpPaymentId;
+    }
+
+    public void setMpPaymentId(Long mpPaymentId) {
+        this.mpPaymentId = mpPaymentId;
+    }
+
+    public String getMpStatusDetail() {
+        return mpStatusDetail;
+    }
+
+    public void setMpStatusDetail(String mpStatusDetail) {
+        this.mpStatusDetail = mpStatusDetail;
     }
 }

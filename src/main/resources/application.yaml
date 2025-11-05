@@ -29,5 +29,11 @@ spring:
           connectiontimeout: 60000  
           timeout: 60000              
           writetimeout: 60000    
-    
+  
+mercadopago:
+  access-token: "APP_USR-3677142545763018-102808-b0d66c0b5bb678de301ae7d97c76dd6a-2951551977" 
+  base-url: https://api.mercadopago.com
+  back-url-base: http://localhost:3000/pagos
+  notification-url: "https://hydrocyanic-porfirio-unevenly.ngrok-free.dev/api/payments/webhook"
+
 

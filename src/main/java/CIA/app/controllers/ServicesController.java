@@ -115,9 +115,9 @@ public class ServicesController {
         }
     }
 
-    @DeleteMapping("/specificService")
+    @DeleteMapping("/specificService/{id}")
     public ResponseEntity<?> deleteSpecificService(@RequestHeader("Authorization") String authHeader,
-            @RequestBody Services services) {
+            @PathVariable Integer id) {
         String token = authHeader.replace("Bearer ", "");
         try {
             String email = jwtUtil.extractEmail(token);
@@ -125,9 +125,9 @@ public class ServicesController {
 
             if (jwtUtil.isTokenValid(token, email) && "Cliente".equals(role)) {
                 try {
-                    Services s = servicesService.deleteEspecificServices(services);
+                    Services s = servicesService.deleteEspecificServices(id);
                     if (s == null) {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Servicio no encontrado");
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Servicio no encontrado O ya fue pagado");
                     }
                     return ResponseEntity.ok("Servicio eliminado exitosamente");
                 } catch (Exception e) {

@@ -20,4 +20,32 @@ public interface CoursesDataRepository extends JpaRepository<CoursesData, Intege
 
     Optional<CoursesData> findById(Integer id);
 
+    @Query("""
+        SELECT c.price
+        FROM CoursesData c
+        WHERE c.type = :courseType AND c.onQueue = false AND c.isFull = false
+    """)
+    int priceByCourseType(@PathVariable("courseType") String courseType);
+
+    @Query("""
+        SELECT c.id
+        FROM CoursesData c
+        WHERE c.type = :courseType AND c.onQueue = false AND c.isFull = false
+    """)
+    int idByCourseType(@PathVariable("courseType") String courseType);
+
+    @Query("""
+        SELECT c
+        FROM CoursesData c
+        WHERE c.onQueue = false AND c.isFull = false
+    """)
+    List<CoursesData> findAvailableCourses();
+
+    @Query("""
+        SELECT c
+        FROM CoursesData c
+        WHERE c.type = :courseType
+        AND c.onQueue = true
+        """)
+    CoursesData getCourseOnQueue(@PathVariable("courseType") String courseType);
 }

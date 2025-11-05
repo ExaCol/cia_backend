@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
 import CIA.app.model.CoursesData;
 import CIA.app.model.Partner;
 import CIA.app.model.SOAT_FARE;
@@ -21,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
+@Order(2)
 public class DataSeeder implements ApplicationRunner {
 
     private final PartnerRepository partnerRepository;
@@ -36,7 +39,7 @@ public class DataSeeder implements ApplicationRunner {
         seedPartners();
         seedAdmin();
         seedEmployee();
-        seedClient();
+        seedClients();
         seedsoatFaresOnce();
         seedTecnoFaresUpsert();
         seedCoursesData();
@@ -124,6 +127,17 @@ public class DataSeeder implements ApplicationRunner {
             coursesDatas.add(c3);
         }
 
+
+        if (!coursesDataRepository.findById(9).isPresent()) {
+            CoursesData cn = new CoursesData();
+            cn.setName("Curso de Comparendo");
+            cn.setParcialCapacity(0);
+            cn.setType("COMPARENDO");
+            cn.setPrice(0);
+            cn.setCapacity(25);
+            coursesDatas.add(cn);
+        }
+
         try {
             coursesDataRepository.saveAllAndFlush(coursesDatas);
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
@@ -139,7 +153,8 @@ public class DataSeeder implements ApplicationRunner {
                     createPartner("Estación Técnico Centro", 4.6862, -74.119, true, true),
                     createPartner("Sucursal Occidente", 4.6838, -74.130, true, true),
                     createPartner("Punto SOAT Suba", 4.6976, -74.064, true, true),
-                    createPartner("Quiosco SOAT El Dorado", 4.6832, -74.204, true, true));
+                    createPartner("Quiosco SOAT El Dorado", 4.6832, -74.204, true, true),
+                    createPartner("CIA", 4.64594945, -74.0776053940335, false, false));
             try {
                 partnerRepository.saveAllAndFlush(partners);
             } catch (org.springframework.dao.DataIntegrityViolationException e) {
@@ -194,23 +209,54 @@ public class DataSeeder implements ApplicationRunner {
         }
     }
 
-    private void seedClient() {
+    // private void seedClient() {
+    //     if (!usrRepository.existsById(3)) {
+    //         Usr c = new Usr();
+    //         c.setName("Juliamcito Pekka");
+    //         c.setIdentification("1092837465");
+    //         c.setEmail("jdnova777@gmail.com");
+    //         c.setPassword(passwordEncoder.encode("Secreta123"));
+    //         c.setLat(4.5901991);
+    //         c.setLon(-74.1008003);
+    //         c.setRole("Cliente");
+    //         try {
+    //             usrRepository.saveAndFlush(c);
+    //         } catch (org.springframework.dao.DataIntegrityViolationException e) {
+    //             System.out.println("Data seeding failed: " + e.getMessage());
+    //         }
+    //     }
+
+    // }
+
+    private void seedClients() {
         if (!usrRepository.existsById(3)) {
-            Usr c = new Usr();
-            c.setName("Cliente #1");
-            c.setIdentification("1092837465");
-            c.setEmail("jdnova777@gmail.com");
-            c.setPassword(passwordEncoder.encode("Secreta123"));
-            c.setLat(4.5901991);
-            c.setLon(-74.1008003);
-            c.setRole("Cliente");
+            List<Usr> users = List.of(
+                    createClient("Juliamcito Pekka", "cc-1092837465", "jdnova777@gmail.com", "Secreta123", 4.5901991, -74.1008003, "Cliente"),
+                    createClient("Laboratorista-FK", "cc-1234567890", "laboratoristaupc@gmail.com", "Secreta123", 4.5901991, -74.1008003, "Cliente"),
+                    createClient("Jefe R-FK", "cc-132456789", "jefelaboratistasupc@gmail.com", "Secreta123", 4.5901991, -74.1008003, "Cliente"),
+                    createClient("Gerente-FK", "cc-01912910", "gerentelaboratistasupc@gmail.com", "Secreta123", 4.5901991, -74.1008003, "Cliente"),
+                    createClient("AdminReservas-FK", "cc-84717362", "adreservasupc@gmail.com", "Secreta123", 4.5901991, -74.1008003, "Cliente"),
+                    createClient("Gestion-FK", "cc-9129813471", "gestionreservasupc@gmail.com", "Secreta123", 4.5901991, -74.1008003, "Cliente"),
+                    createClient("Juliamcito Maluma 2.6", "cc-15273912", "jnovatorroledo@gmail.com", "Secreta123", 4.5901991, -74.1008003, "Cliente")
+                    );
             try {
-                usrRepository.saveAndFlush(c);
+                usrRepository.saveAllAndFlush(users);
             } catch (org.springframework.dao.DataIntegrityViolationException e) {
                 System.out.println("Data seeding failed: " + e.getMessage());
             }
         }
+    }
 
+    private Usr createClient(String name, String identification, String email, String password, double lat, double lon, String role) {
+        Usr u = new Usr();
+        u.setName(name);
+        u.setIdentification(identification);
+        u.setEmail(email);
+        u.setPassword(passwordEncoder.encode(password));
+        u.setLat(lat);
+        u.setLon(lon);
+        u.setRole(role);
+        return u;
     }
 
     private void seedsoatFaresOnce() {
@@ -274,10 +320,10 @@ public class DataSeeder implements ApplicationRunner {
                 { "Pesado Particular", 2009, 2017, 741241 },
                 { "Pesado Particular", 2008, 2008, 471041 },
 
-                { "Pesado Público", 2023, 2025, 470341 },
-                { "Pesado Público", 2018, 2022, 470541 },
-                { "Pesado Público", 2009, 2017, 470741 },
-                { "Pesado Público", 2008, 2008, 470541 }
+                { "Pesado Publico", 2023, 2025, 470341 },
+                { "Pesado Publico", 2018, 2022, 470541 },
+                { "Pesado Publico", 2009, 2017, 470741 },
+                { "Pesado Publico", 2008, 2008, 470541 }
         };
 
         for (Object[] r : rows) {

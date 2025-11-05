@@ -114,7 +114,7 @@ public class UsrService {
         type = type.toUpperCase();
         if (type.equals("SOAT")) {
             return partnerRepository.getPartnersBySoat();
-        } else if (type.equals("TECHNO")) {
+        } else if (type.equals("TECNO")) {
             return partnerRepository.getPartnersByTechno();
         }
         return partnerRepository.getCIA();
@@ -200,6 +200,7 @@ public class UsrService {
         return null;
     }
 
+    //No se usa
     public CoursesData registerUserToCourse(String email, CoursesData course) {
         Usr user = usrRepository.findByEmail(email);
         if (user != null) {
@@ -222,6 +223,7 @@ public class UsrService {
         return null;
     }
 
+    //No se usa
     public CoursesData deleteUserFromCourse(String email, CoursesData course) {
         Usr user = usrRepository.findByEmail(email);
         if (user != null) {
@@ -244,10 +246,11 @@ public class UsrService {
         return null;
     }
 
+    //Tal vez si
     public List<CoursesData> getAllCourses(String email) {
         Usr usr = usrRepository.findByEmail(email);
         if (usr != null) {
-            return coursesDataRepository.findAll();
+            return coursesDataRepository.findAvailableCourses();
         }
         return null;
     }
