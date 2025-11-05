@@ -2,7 +2,6 @@ package CIA.app.components;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
@@ -127,6 +126,7 @@ public class DataSeeder implements ApplicationRunner {
             c3.setCapacity(25);
             coursesDatas.add(c3);
         }
+
 
         if (!coursesDataRepository.findById(9).isPresent()) {
             CoursesData cn = new CoursesData();

@@ -4,10 +4,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import CIA.app.model.CoursesData;
 import CIA.app.model.Usr;
 import CIA.app.repositories.CoursesDataRepository;
