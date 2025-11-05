@@ -1,6 +1,9 @@
 package CIA.app.repositories;
 
+import java.lang.foreign.Linker.Option;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,4 +25,5 @@ public interface ServicesRepository extends JpaRepository<Services, Integer>{
            """)
     List<Services> getServicesByType(@Param("type") String type);
 
+    Optional<Services> findById(int id);
 }

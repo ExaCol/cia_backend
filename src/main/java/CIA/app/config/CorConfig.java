@@ -31,7 +31,7 @@ public class CorConfig {
      *           "http://localhost:3000", // Desarrollo local
      *           "https://frontend.wagglo.com" // Producción real
      *           )
-     *           .allowedMethods("GET", "POST", "PUT", "DELETE")
+     *           .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")
      *           .allowedHeaders("Authorization", "Content-Type")
      *           .allowCredentials(true);
      *           }

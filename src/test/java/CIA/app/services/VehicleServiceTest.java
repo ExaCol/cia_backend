@@ -22,7 +22,7 @@ import CIA.app.repositories.VehicleRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class VehicleServiceTest {
-    /* 
+    
     @Mock
     private VehicleRepository vehicleRepository;
 
@@ -46,7 +46,7 @@ public class VehicleServiceTest {
         v.setType("car");
         v.setPlate(plateLowerOrUpper);
         v.setSoatRateType("A");
-        v.setTechnoClassification("Particular");
+        v.setModel(2020);
         v.setSoatExpiration(Date.valueOf("2026-01-01"));
         v.setTechnoExpiration(Date.valueOf("2026-06-01"));
         return v;
@@ -123,5 +123,5 @@ public class VehicleServiceTest {
         verify(vehicleRepository).findByUsr_EmailAndPlate(email, plate);
         verify(vehicleRepository).delete(v);
     }
-        */
+        
 }

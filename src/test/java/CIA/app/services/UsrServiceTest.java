@@ -4,16 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-
-import org.checkerframework.checker.units.qual.s;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,13 +19,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import CIA.app.model.CoursesData;
 import CIA.app.model.Partner;
 import CIA.app.model.Services;
 import CIA.app.model.Usr;
 import CIA.app.repositories.CoursesDataRepository;
+import CIA.app.repositories.PartnerRepository;
 import CIA.app.repositories.ServicesRepository;
+import CIA.app.repositories.TokenRepository;
 import CIA.app.repositories.UsrRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,6 +43,12 @@ public class UsrServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private PartnerRepository partnerRepository;
+
+    @Mock
+    private TokenRepository tokenRepository;
+
     @InjectMocks
     private UsrService usrService;
 
@@ -62,7 +64,8 @@ public class UsrServiceTest {
         u.setName(name);
         u.setPassword("raw");
         u.setLat(4.5940736);
-        u.setLon(-74.1081088);;
+        u.setLon(-74.1081088);
+        ;
         return u;
     }
 
@@ -75,20 +78,25 @@ public class UsrServiceTest {
         return c;
     }
 
-    private static Partner makePartner(int id, String name, double lat, double lon){
+    // --- NUEVO: helper para crear Services apuntando a un Partner ---
+    private static Services makeService(int id, String type, Partner partner) {
+        Services s = new Services();
+        s.setId(id);
+        s.setServiceType(type);
+        s.setPartner(partner);
+        return s;
+    }
+
+    // --- Helper ya propuesto antes para Partner (si no lo añadiste, agrégalo) ---
+    private static Partner makePartner(int id, String name, double lat, double lon, boolean soat, boolean techno) {
         Partner p = new Partner();
         p.setId(id);
         p.setName(name);
         p.setLat(lat);
         p.setLon(lon);
+        p.setSoat(soat);
+        p.setTechno(techno);
         return p;
-    }
-
-    private static Services makeService(String type, Partner partners){
-        Services s = new Services();
-        s.setServiceType(type);
-        s.setPartner(partners);
-        return s;
     }
 
     @Test
@@ -200,7 +208,8 @@ public class UsrServiceTest {
         assertNotNull(out);
         verify(usrRepository).save(captor.capture());
         Usr saved = captor.getValue();
-        assertTrue(BCrypt.checkpw("newSecret", saved.getPassword()), "El password guardado debe ser el hash de 'newSecret'");
+        assertTrue(BCrypt.checkpw("newSecret", saved.getPassword()),
+                "El password guardado debe ser el hash de 'newSecret'");
     }
 
     @Test
@@ -230,20 +239,19 @@ public class UsrServiceTest {
 
         Usr simulatedUsr = makeUser(email, "CC1021", "Exa");
         List<CoursesData> simulatedCourses = List.of(
-            makeCourse(1, "Curso A", 0, 20),
-            makeCourse(2, "Curso B", 0, 25)
-        );
-        
+                makeCourse(1, "Curso A", 0, 20),
+                makeCourse(2, "Curso B", 0, 25));
+
         when(usrRepository.findByEmail(email)).thenReturn(simulatedUsr);
         when(coursesDataRepository.findAll()).thenReturn(simulatedCourses);
 
-        List<CoursesData> outCourses = usrService.getAllCourses(email);  
-        
+        List<CoursesData> outCourses = usrService.getAllCourses(email);
+
         assertNotNull(outCourses);
         assertEquals(simulatedCourses, outCourses);
         verify(usrRepository).findByEmail(email);
         verify(coursesDataRepository).findAll();
-        
+
     }
 
     @Test
@@ -252,15 +260,14 @@ public class UsrServiceTest {
 
         Usr simulatedUsr = makeUser(email, "CC1021", "Exa");
         List<CoursesData> simulatedCourses = List.of(
-            makeCourse(1, "Curso A", 0, 20),
-            makeCourse(2, "Curso B", 0, 25)
-        );
+                makeCourse(1, "Curso A", 0, 20),
+                makeCourse(2, "Curso B", 0, 25));
 
         when(usrRepository.findByEmail(email)).thenReturn(simulatedUsr);
         when(coursesDataRepository.getCoursesByUser(simulatedUsr.getId())).thenReturn(simulatedCourses);
 
-        List<CoursesData> outCourses = usrService.getCoursesByUser(email);  
-        
+        List<CoursesData> outCourses = usrService.getCoursesByUser(email);
+
         assertNotNull(outCourses);
         assertEquals(simulatedCourses, outCourses);
         verify(usrRepository).findByEmail(email);
@@ -277,10 +284,10 @@ public class UsrServiceTest {
         simulatedUsr.setCourses(new ArrayList<>());
         CoursesData simulatedCourse = makeCourse(1, "Curso A", 0, 20);
         simulatedCourse.setUsrs(new ArrayList<>());
-        
-        //simulatedUsr.getCourses().add(simulatedCourse);
-        //simulatedCourse.setParcialCapacity(simulatedCourse.getParcialCapacity() + 1);
-        //simulatedCourse.getUsrs().add(simulatedUsr);
+
+        // simulatedUsr.getCourses().add(simulatedCourse);
+        // simulatedCourse.setParcialCapacity(simulatedCourse.getParcialCapacity() + 1);
+        // simulatedCourse.getUsrs().add(simulatedUsr);
 
         when(usrRepository.findByEmail(email)).thenReturn(simulatedUsr);
         when(coursesDataRepository.findById(simulatedCourse.getId())).thenReturn(Optional.of(simulatedCourse));
@@ -294,7 +301,7 @@ public class UsrServiceTest {
 
         verify(usrRepository).findByEmail(email);
         verify(coursesDataRepository).findById(simulatedCourse.getId());
-        //verify(usrRepository).save(simulatedUsr);
+        // verify(usrRepository).save(simulatedUsr);
     }
 
     @Test
@@ -307,10 +314,10 @@ public class UsrServiceTest {
         simulatedCourse.getUsrs().add(simulatedUsr);
         simulatedUsr.setCourses(new ArrayList<>());
         simulatedUsr.getCourses().add(simulatedCourse);
-        
-        //simulatedUsr.getCourses().add(simulatedCourse);
-        //simulatedCourse.setParcialCapacity(simulatedCourse.getParcialCapacity() + 1);
-        //simulatedCourse.getUsrs().add(simulatedUsr);
+
+        // simulatedUsr.getCourses().add(simulatedCourse);
+        // simulatedCourse.setParcialCapacity(simulatedCourse.getParcialCapacity() + 1);
+        // simulatedCourse.getUsrs().add(simulatedUsr);
 
         when(usrRepository.findByEmail(email)).thenReturn(simulatedUsr);
         when(coursesDataRepository.findById(simulatedCourse.getId())).thenReturn(Optional.of(simulatedCourse));
@@ -327,74 +334,76 @@ public class UsrServiceTest {
     }
 
     @Test
-    void getNearestPartner_success(){
+    void getPartnerByService_SOAT_success() {
+        Partner a = makePartner(1, "Partner A", 4.6838, -74.13, true, false);
+        Partner b = makePartner(2, "Partner B", 4.6862, -74.119, true, false);
+
+        when(partnerRepository.getPartnersBySoat()).thenReturn(List.of(a, b));
+
+        List<Partner> out = usrService.getPartnerByService("SOAT");
+
+        assertNotNull(out);
+        assertEquals(2, out.size());
+        assertEquals(1, out.get(0).getId());
+        assertEquals(2, out.get(1).getId());
+        verify(partnerRepository).getPartnersBySoat();
+    }
+
+    @Test
+    void getPartnerByService_TECHNO_success() {
+        Partner c = makePartner(3, "Partner C", 4.6850, -74.118, false, true);
+
+        when(partnerRepository.getPartnersByTechno()).thenReturn(List.of(c));
+
+        List<Partner> out = usrService.getPartnerByService("TECHNO");
+
+        assertNotNull(out);
+        assertEquals(1, out.size());
+        assertEquals(3, out.get(0).getId());
+        verify(partnerRepository).getPartnersByTechno();
+    }
+
+    @Test
+    void getPartnerByService_default_success() {
+        Partner x = makePartner(9, "Partner X", 4.60, -74.09, false, false);
+
+        when(partnerRepository.getCIA()).thenReturn(List.of(x));
+
+        List<Partner> out = usrService.getPartnerByService("OTRO");
+
+        assertNotNull(out);
+        assertEquals(1, out.size());
+        assertEquals(9, out.get(0).getId());
+        verify(partnerRepository).getCIA();
+    }
+
+    @Test
+    void getNearestPartner_success() {
         String email = "exatest@gmail.com";
-        Usr simulatedUsr = makeUser(email, "CC1021", "Exa");
         String type = "SOAT";
-        Double maxDistanceSimulated = 10280.0;
-        
-        Partner p1 = makePartner(1, "Partner A", 4.6838, -74.13); 
-        Partner p2 = makePartner(2, "Partner B", 4.6862, -74.119); //Más lejano
-        Partner p3 = makePartner(3, "Partner C", 4.685, -74.118); //Más cercano
-        
-        List<Partner> servicePartnersA = new ArrayList<>();
-        servicePartnersA.add(p1);
-        servicePartnersA.add(p2);
+        double maxDistanceSimulated = 10280.0; // ~10.28 km
 
-        List<Partner> servicePartnersB = new ArrayList<>();
-        servicePartnersB.add(p3);
+        // Usuario (coords de tu modelo)
+        Usr user = makeUser(email, "CC1021", "Exa");
 
-        Services s1 = makeService(type, p1);
-        Services s2 = makeService(type, p2);
+        // Partners candidatos (todos "SOAT")
+        Partner a = makePartner(1, "Partner A", 4.6838, -74.13, true, false);
+        Partner b = makePartner(2, "Partner B", 4.6862, -74.119, true, false);
+        Partner c = makePartner(3, "Partner C", 4.6850, -74.118, true, false);
 
-        when(usrRepository.findByEmail(email)).thenReturn(simulatedUsr);
-        when(servicesRepository.getServicesByType(type)).thenReturn(List.of(s1, s2));
+        when(usrRepository.findByEmail(email)).thenReturn(user);
+        when(partnerRepository.getPartnersBySoat()).thenReturn(List.of(a, b, c));
 
         List<Partner> outPartners = usrService.getNearestPartner(email, type, maxDistanceSimulated);
 
         assertNotNull(outPartners);
-        assertEquals(2, outPartners.size());
-        assertEquals(List.of(p3, p1), outPartners);
+        // Según tu caso de ejemplo: { (3,"Partner C"), (1,"Partner A") }
+        assertEquals(2, outPartners.size(), "Se esperan 2 partners dentro del radio");
+        assertEquals(3, outPartners.get(0).getId(), "El más cercano esperado es Partner C");
+        assertEquals(1, outPartners.get(1).getId(), "El segundo esperado es Partner A");
+
         verify(usrRepository).findByEmail(email);
-        verify(servicesRepository).getServicesByType(type);
-
+        verify(partnerRepository).getPartnersBySoat();
     }
 
-    @Test
-    void getPartnersByTypeServicesNR_success(){
-        String type = "SOAT";
-        
-        Partner p1 = makePartner(1, "Partner A", 4.6838, -74.13); 
-        Partner p2 = makePartner(2, "Partner B", 4.6862, -74.119); //Más lejano
-        Partner p3 = makePartner(3, "Partner C", 4.685, -74.118);  //Más cercano
-        
-        List<Partner> servicePartnersA = new ArrayList<>();
-        servicePartnersA.add(p1);
-        servicePartnersA.add(p2);
-
-        List<Partner> servicePartnersB = new ArrayList<>();
-        servicePartnersA.add(p3);
-        servicePartnersA.add(p1);
-
-        List<Partner> servicePartnersC = new ArrayList<>();
-        servicePartnersA.add(null);
-        servicePartnersA.add(p2);
-
-        Services s1 = makeService(type, p1);
-        Services s2 = makeService(type, p2);
-        Services s3 = makeService(type, p3);
-
-        when(servicesRepository.getServicesByType(type)).thenReturn(List.of(s1, s2, s3));
-
-        List<Partner> outMap = usrService.getPartnerByService(type);
-
-        assertNotNull(outMap);
-        assertEquals(3, outMap.size());
-        //assertTrue(outMap.containsKey(p1.getId()));
-        //assertTrue(outMap.containsKey(p2.getId()));
-        //assertTrue(outMap.containsKey(p3.getId()));
-        verify(servicesRepository).getServicesByType(type);
-    }
-
-    
 }

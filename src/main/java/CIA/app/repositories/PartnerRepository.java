@@ -31,5 +31,4 @@ public interface PartnerRepository extends JpaRepository<Partner, Integer> {
         WHERE p.name = 'CIA'
       """)
   List<Partner> getCIA();
-
 }

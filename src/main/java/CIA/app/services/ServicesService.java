@@ -80,9 +80,13 @@ public class ServicesService {
         return s.orElse(null);
     }
 
-    public Services deleteEspecificServices(Services service) {
-        Services s = getSpecificServices(service.getId());
-        if (s != null) {
+    public Services deleteEspecificServices(Integer serviceId) {
+        Optional<Services> services = servicesRepository.findById(serviceId);
+        if (services.isPresent()) {
+            Services s = services.get();
+            if(s.isPaid()){
+                return null;
+            }
             servicesRepository.delete(s);
             return s;
         }
