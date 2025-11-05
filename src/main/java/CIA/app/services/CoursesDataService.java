@@ -142,13 +142,19 @@ public class CoursesDataService {
             CoursesData searchCourseOnQueue = coursesDataRepository.getCourseOnQueue(fullCourse.getType());
             if (searchCourseOnQueue != null) {
                 //Ya se hay curso creado, se iguala el curso encontrado uno nuevo
-                if (searchCourseOnQueue.getParcialCapacity() + 1 >= 3) {
-                    //Ya hay 3 interesados, poner en público este curso (2+1 lo pone en público)
-                    searchCourseOnQueue.setParcialCapacity(searchCourseOnQueue.getParcialCapacity() + 1);
-                    searchCourseOnQueue.getUsrs().add(userOpt);
+                int userInteresteds = searchCourseOnQueue.getParcialCapacity() + 1;
+                userOpt.getCourses().add(searchCourseOnQueue);
+                usrRepository.save(userOpt);
+                searchCourseOnQueue.setParcialCapacity(userInteresteds);
 
+                if (userInteresteds >= 5) {
+                    //Ya hay 3 interesados, poner en público este curso (2+1 lo pone en público)
+                    searchCourseOnQueue.getUsrs().add(userOpt);
                     searchCourseOnQueue.setOnQueue(false);
                     fullCourse.setFull(true);
+
+                    //userOpt.getCourses().add(searchCourseOnQueue);
+                    //usrRepository.save(userOpt);
 
                     coursesDataRepository.save(fullCourse);
                     coursesDataRepository.save(searchCourseOnQueue);
@@ -162,8 +168,10 @@ public class CoursesDataService {
                 }
                 //No entró al if porque no ha llegado al mínimo de interesados
                 System.out.println("--------------------NO TIENE AÚN EL MINIMO DE INTERESADOS ----------------");
-                searchCourseOnQueue.setParcialCapacity(searchCourseOnQueue.getParcialCapacity() + 1);
-                searchCourseOnQueue.getUsrs().add(userOpt);
+                //searchCourseOnQueue.setParcialCapacity(searchCourseOnQueue.getParcialCapacity() + 1);
+                //userOpt.getCourses().add(searchCourseOnQueue);
+                //usrRepository.save(userOpt);
+                //searchCourseOnQueue.getUsrs().add(userOpt);
                 coursesDataRepository.save(searchCourseOnQueue);
                 log.info("Usuario {} agregado a cola del curso {}. Total interesados: {}",
                         userOpt.getId(), searchCourseOnQueue.getId(), searchCourseOnQueue.getParcialCapacity());
@@ -180,10 +188,13 @@ public class CoursesDataService {
             newCourse.setCapacity(fullCourse.getCapacity());
             newCourse.setOnQueue(true);
             newCourse.setFull(false);
-            //newCourse.getUsrs().clear();
             newCourse.setUsrs(new ArrayList<>());
             newCourse.getUsrs().add(userOpt);
             coursesDataRepository.save(newCourse);
+            //newCourse.getUsrs().clear();
+            userOpt.getCourses().add(newCourse);
+            usrRepository.save(userOpt);
+            
             log.info("Nuevo curso en cola creado id={}, type={}, interesados={}",
                         newCourse.getId(), newCourse.getType(), newCourse.getParcialCapacity());
             return;
