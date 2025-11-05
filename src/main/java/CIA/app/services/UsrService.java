@@ -200,6 +200,7 @@ public class UsrService {
         return null;
     }
 
+    //No se usa
     public CoursesData registerUserToCourse(String email, CoursesData course) {
         Usr user = usrRepository.findByEmail(email);
         if (user != null) {
@@ -222,6 +223,7 @@ public class UsrService {
         return null;
     }
 
+    //No se usa
     public CoursesData deleteUserFromCourse(String email, CoursesData course) {
         Usr user = usrRepository.findByEmail(email);
         if (user != null) {
@@ -244,10 +246,11 @@ public class UsrService {
         return null;
     }
 
+    //Tal vez si
     public List<CoursesData> getAllCourses(String email) {
         Usr usr = usrRepository.findByEmail(email);
         if (usr != null) {
-            return coursesDataRepository.findAll();
+            return coursesDataRepository.findAvailableCourses();
         }
         return null;
     }

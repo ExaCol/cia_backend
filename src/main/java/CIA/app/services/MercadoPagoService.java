@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.mercadopago.client.payment.PaymentClient;
 import com.mercadopago.client.preference.PreferenceBackUrlsRequest;
@@ -30,9 +33,15 @@ import CIA.app.repositories.ServicesRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 @RequiredArgsConstructor
 public class MercadoPagoService {
+
+    private static final Logger log = LoggerFactory.getLogger(CoursesDataService.class);
+
     private final MercadoPagoProperties props;
     private final ServicesRepository servicesRepo;
     private final PaymentsRepository paymentsRepo;
@@ -150,80 +159,89 @@ public class MercadoPagoService {
         Partner partner = partnerRepository.findById(service.getPartner().getId()).get();
         String urlMapa = "https://www.google.com/maps?q=" + partner.getLat() + "," + partner.getLon();
         String serviceType = service.getServiceType().toUpperCase();
+        try{
+            if (serviceType.equals("COURSE")) {
+                int courseId = coursesDataRepository.idByCourseType(service.getCourseType());
+                String enroll = coursesDataService.enroll(usr.getId(), courseId);
+                asunto = "Confirmación de pago - Curso";
 
-        if (serviceType.equals("COURSE")) {
-            int courseId = coursesDataRepository.idByCourseType(service.getCourseType());
-            String enroll = coursesDataService.enroll(usr.getId(), courseId);
-            asunto = "Confirmación de pago - Curso";
+                if(enroll != null){
+                    mensaje = "Hola, " + usr.getName() + ".\n"
+                        + "¡Tu pago fue confirmado! 🎉\n"
+                        + "Detalles del pago:\n"
+                        + "• Servicio: Curso" + "\n"
+                        + "• Categoría del curso:" + service.getCourseType() + "\n"
+                        + "• Monto: " + service.getPrice() + "\n"
+                        + "• Fecha: " + pay.getReleaseDate() + "\n"
+                        + "• Partner: " + partner.getName() + " ubicado en " + urlMapa + "\n"
+                        + "• Ref. externa: " + pay.getExternalReference() + "\n"
+                        + "• Pago MP ID: " + pay.getMpPaymentId() + "\n"
+                        + "Ya fuiste inscrito al curso exitosamente.\n"
+                        + "👉Acércate a nuestra sucursal.\n"
+                        + "Si no reconoces este pago, contáctanos de inmediato respondiendo a este correo.\n"
+                        + "Saludos,\n"
+                        + "El equipo de SmartTraffic.";
+                }else{
+                    mensaje = "Hola, " + usr.getName() + ".\n"
+                        + "¡Tu pago fue confirmado! 🎉\n"
+                        + "Detalles del pago:\n"
+                        + "• Servicio: Curso" + "\n"
+                        + "• Categoría del curso:" + service.getCourseType() + "\n"
+                        + "• Monto: " + service.getPrice() + "\n"
+                        + "• Fecha: " + pay.getReleaseDate() + "\n"
+                        + "• Partner: " + partner.getName() + " ubicado en " + urlMapa + "\n"
+                        + "• Ref. externa: " + pay.getExternalReference() + "\n"
+                        + "• Pago MP ID: " + pay.getMpPaymentId() + "\n"
+                        + "No pudimos inscribirte al curso. De haber más interesados en este curso, te notificaremos y abriremos nuevos cupos.\n"
+                        + "👉Acércate a nuestra sucursal.\n"
+                        + "Si no reconoces este pago, contáctanos de inmediato respondiendo a este correo.\n"
+                        + "Saludos,\n"
+                        + "El equipo de SmartTraffic.";
+                }
+                
+            } else if (serviceType.equals("SOAT")) {
+                asunto = "Confirmación de pago - Soat";
+                mensaje = "Hola, " + usr.getName() + ".\n"
+                        + "¡Tu pago fue confirmado! 🎉\n"
+                        + "Detalles del pago:\n"
+                        + "• Servicio: Soat" + "\n"
+                        + "• Placa: " + service.getPlate() + "\n"
+                        + "• Monto: " + service.getPrice() + "\n"
+                        + "• Fecha: " + pay.getReleaseDate() + "\n"
+                        + "• Partner: " + partner.getName() + " ubicado en " + urlMapa + "\n"
+                        + "• Ref. externa: " + pay.getExternalReference() + "\n"
+                        + "• Pago MP ID: " + pay.getMpPaymentId() + "\n"
+                        + "👉Acércate a nuestra sucursal.\n"
+                        + "Si no reconoces este pago, contáctanos de inmediato respondiendo a este correo.\n"
+                        + "Saludos,\n"
+                        + "El equipo de SmartTraffic.";
 
-            if(enroll != null){
+            } else if (serviceType.equals("TECNO")) {
+                asunto = "Confirmación de pago - Tecnomecánica";
                 mensaje = "Hola, " + usr.getName() + ".\n"
-                    + "¡Tu pago fue confirmado! 🎉\n"
-                    + "Detalles del pago:\n"
-                    + "• Servicio: Curso" + "\n"
-                    + "• Categoría del curso:" + service.getCourseType() + "\n"
-                    + "• Monto: " + service.getPrice() + "\n"
-                    + "• Fecha: " + pay.getReleaseDate() + "\n"
-                    + "• Partner: " + partner.getName() + " ubicado en " + urlMapa + "\n"
-                    + "• Ref. externa: " + pay.getExternalReference() + "\n"
-                    + "• Pago MP ID: " + pay.getMpPaymentId() + "\n"
-                    + "Ya fuiste inscrito al curso exitosamente.\n"
-                    + "👉Acércate a nuestra sucursal.\n"
-                    + "Si no reconoces este pago, contáctanos de inmediato respondiendo a este correo.\n"
-                    + "Saludos,\n"
-                    + "El equipo de SmartTraffic.";
-            }else{
-                mensaje = "Hola, " + usr.getName() + ".\n"
-                    + "¡Tu pago fue confirmado! 🎉\n"
-                    + "Detalles del pago:\n"
-                    + "• Servicio: Curso" + "\n"
-                    + "• Categoría del curso:" + service.getCourseType() + "\n"
-                    + "• Monto: " + service.getPrice() + "\n"
-                    + "• Fecha: " + pay.getReleaseDate() + "\n"
-                    + "• Partner: " + partner.getName() + " ubicado en " + urlMapa + "\n"
-                    + "• Ref. externa: " + pay.getExternalReference() + "\n"
-                    + "• Pago MP ID: " + pay.getMpPaymentId() + "\n"
-                    + "No pudimos inscribirte al curso. De haber más interesados en este curso, te notificaremos y abriremos nuevos cupos.\n"
-                    + "👉Acércate a nuestra sucursal.\n"
-                    + "Si no reconoces este pago, contáctanos de inmediato respondiendo a este correo.\n"
-                    + "Saludos,\n"
-                    + "El equipo de SmartTraffic.";
+                        + "¡Tu pago fue confirmado! 🎉\n"
+                        + "Detalles del pago:\n"
+                        + "• Servicio: Tecnomecánica" + "\n"
+                        + "• Placa: " + service.getPlate() + "\n"
+                        + "• Monto: " + service.getPrice() + "\n"
+                        + "• Fecha: " + pay.getReleaseDate() + "\n"
+                        + "• Partner: " + partner.getName() + " ubicado en " + urlMapa + "\n"
+                        + "• Ref. externa: " + pay.getExternalReference() + "\n"
+                        + "• Pago MP ID: " + pay.getMpPaymentId() + "\n"
+                        + "👉Acércate a nuestra sucursal.\n"
+                        + "Si no reconoces este pago, contáctanos de inmediato respondiendo a este correo.\n"
+                        + "Saludos,\n"
+                        + "El equipo de SmartTraffic.";
             }
-            
-        } else if (serviceType.equals("SOAT")) {
-            asunto = "Confirmación de pago - Soat";
+        }catch(Exception e){
+            log.error("Error en postPaymentSuccess (construcción de mensaje)", e);
+            asunto = "Confirmación de pago - Curso";
             mensaje = "Hola, " + usr.getName() + ".\n"
-                    + "¡Tu pago fue confirmado! 🎉\n"
-                    + "Detalles del pago:\n"
-                    + "• Servicio: Soat" + "\n"
-                    + "• Placa: " + service.getPlate() + "\n"
-                    + "• Monto: " + service.getPrice() + "\n"
-                    + "• Fecha: " + pay.getReleaseDate() + "\n"
-                    + "• Partner: " + partner.getName() + " ubicado en " + urlMapa + "\n"
-                    + "• Ref. externa: " + pay.getExternalReference() + "\n"
-                    + "• Pago MP ID: " + pay.getMpPaymentId() + "\n"
-                    + "👉Acércate a nuestra sucursal.\n"
-                    + "Si no reconoces este pago, contáctanos de inmediato respondiendo a este correo.\n"
-                    + "Saludos,\n"
-                    + "El equipo de SmartTraffic.";
-
-        } else if (serviceType.equals("TECNO")) {
-            asunto = "Confirmación de pago - Tecnomecánica";
-            mensaje = "Hola, " + usr.getName() + ".\n"
-                    + "¡Tu pago fue confirmado! 🎉\n"
-                    + "Detalles del pago:\n"
-                    + "• Servicio: Tecnomecánica" + "\n"
-                    + "• Placa: " + service.getPlate() + "\n"
-                    + "• Monto: " + service.getPrice() + "\n"
-                    + "• Fecha: " + pay.getReleaseDate() + "\n"
-                    + "• Partner: " + partner.getName() + " ubicado en " + urlMapa + "\n"
-                    + "• Ref. externa: " + pay.getExternalReference() + "\n"
-                    + "• Pago MP ID: " + pay.getMpPaymentId() + "\n"
-                    + "👉Acércate a nuestra sucursal.\n"
-                    + "Si no reconoces este pago, contáctanos de inmediato respondiendo a este correo.\n"
-                    + "Saludos,\n"
-                    + "El equipo de SmartTraffic.";
+            + "¡Tu pago fue confirmado! 🎉\n"
+            + "Estamos procesando tu inscripción. Te notificaremos cualquier novedad.\n"
+            + "Saludos,\nEl equipo de SmartTraffic.";
         }
+
         emailService.enviarCorreo(usr.getEmail(), asunto, mensaje);
     }
 }

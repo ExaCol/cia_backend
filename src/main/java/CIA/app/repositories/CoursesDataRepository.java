@@ -44,7 +44,8 @@ public interface CoursesDataRepository extends JpaRepository<CoursesData, Intege
     @Query("""
         SELECT c
         FROM CoursesData c
-        WHERE c.onQueue = true AND c.type = :courseType
-    """)
+        WHERE c.type = :courseType
+        AND c.onQueue = true
+        """)
     CoursesData getCourseOnQueue(@PathVariable("courseType") String courseType);
 }

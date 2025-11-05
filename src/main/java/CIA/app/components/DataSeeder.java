@@ -2,10 +2,13 @@ package CIA.app.components;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
 import CIA.app.model.CoursesData;
 import CIA.app.model.Partner;
 import CIA.app.model.SOAT_FARE;
@@ -21,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
+@Order(2)
 public class DataSeeder implements ApplicationRunner {
 
     private final PartnerRepository partnerRepository;
@@ -36,7 +40,7 @@ public class DataSeeder implements ApplicationRunner {
         seedPartners();
         seedAdmin();
         seedEmployee();
-        seedClient();
+        seedClients();
         seedsoatFaresOnce();
         seedTecnoFaresUpsert();
         seedCoursesData();
@@ -205,23 +209,54 @@ public class DataSeeder implements ApplicationRunner {
         }
     }
 
-    private void seedClient() {
+    // private void seedClient() {
+    //     if (!usrRepository.existsById(3)) {
+    //         Usr c = new Usr();
+    //         c.setName("Juliamcito Pekka");
+    //         c.setIdentification("1092837465");
+    //         c.setEmail("jdnova777@gmail.com");
+    //         c.setPassword(passwordEncoder.encode("Secreta123"));
+    //         c.setLat(4.5901991);
+    //         c.setLon(-74.1008003);
+    //         c.setRole("Cliente");
+    //         try {
+    //             usrRepository.saveAndFlush(c);
+    //         } catch (org.springframework.dao.DataIntegrityViolationException e) {
+    //             System.out.println("Data seeding failed: " + e.getMessage());
+    //         }
+    //     }
+
+    // }
+
+    private void seedClients() {
         if (!usrRepository.existsById(3)) {
-            Usr c = new Usr();
-            c.setName("Juliamcito Pekka");
-            c.setIdentification("1092837465");
-            c.setEmail("jdnova777@gmail.com");
-            c.setPassword(passwordEncoder.encode("Secreta123"));
-            c.setLat(4.5901991);
-            c.setLon(-74.1008003);
-            c.setRole("Cliente");
+            List<Usr> users = List.of(
+                    createClient("Juliamcito Pekka", "cc-1092837465", "jdnova777@gmail.com", "Secreta123", 4.5901991, -74.1008003, "Cliente"),
+                    createClient("Laboratorista-FK", "cc-1234567890", "laboratoristaupc@gmail.com", "Secreta123", 4.5901991, -74.1008003, "Cliente"),
+                    createClient("Jefe R-FK", "cc-132456789", "jefelaboratistasupc@gmail.com", "Secreta123", 4.5901991, -74.1008003, "Cliente"),
+                    createClient("Gerente-FK", "cc-01912910", "gerentelaboratistasupc@gmail.com", "Secreta123", 4.5901991, -74.1008003, "Cliente"),
+                    createClient("AdminReservas-FK", "cc-84717362", "adreservasupc@gmail.com", "Secreta123", 4.5901991, -74.1008003, "Cliente"),
+                    createClient("Gestion-FK", "cc-9129813471", "gestionreservasupc@gmail.com", "Secreta123", 4.5901991, -74.1008003, "Cliente"),
+                    createClient("Juliamcito Maluma 2.6", "cc-15273912", "jnovatorroledo@gmail.com", "Secreta123", 4.5901991, -74.1008003, "Cliente")
+                    );
             try {
-                usrRepository.saveAndFlush(c);
+                usrRepository.saveAllAndFlush(users);
             } catch (org.springframework.dao.DataIntegrityViolationException e) {
                 System.out.println("Data seeding failed: " + e.getMessage());
             }
         }
+    }
 
+    private Usr createClient(String name, String identification, String email, String password, double lat, double lon, String role) {
+        Usr u = new Usr();
+        u.setName(name);
+        u.setIdentification(identification);
+        u.setEmail(email);
+        u.setPassword(passwordEncoder.encode(password));
+        u.setLat(lat);
+        u.setLon(lon);
+        u.setRole(role);
+        return u;
     }
 
     private void seedsoatFaresOnce() {
