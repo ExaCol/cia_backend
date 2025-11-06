@@ -338,7 +338,7 @@ public class UsrServiceTest {
 
         when(partnerRepository.getCIA()).thenReturn(List.of(x));
 
-        List<Partner> out = usrService.getPartnerByService("OTRO");
+        List<Partner> out = usrService.getPartnerByService("COURSE");
 
         assertNotNull(out);
         assertEquals(1, out.size());
