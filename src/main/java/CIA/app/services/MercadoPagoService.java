@@ -22,6 +22,8 @@ import com.mercadopago.resources.payment.Payment;
 import CIA.app.components.MercadoPagoProperties;
 import CIA.app.dtos.CheckoutRequest;
 import CIA.app.dtos.CheckoutResponse;
+import CIA.app.interfaces.MPPaymentGateway;
+import CIA.app.interfaces.MPPreferenceGateway;
 import CIA.app.model.Partner;
 import CIA.app.model.Payments;
 import CIA.app.model.Services;
@@ -31,6 +33,7 @@ import CIA.app.repositories.PartnerRepository;
 import CIA.app.repositories.PaymentsRepository;
 import CIA.app.repositories.ServicesRepository;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import org.slf4j.Logger;
@@ -49,6 +52,10 @@ public class MercadoPagoService {
     private final PartnerRepository partnerRepository;
     private final CoursesDataRepository coursesDataRepository;
     private final CoursesDataService coursesDataService;
+
+    
+  private final MPPreferenceGateway mpPreferenceGateway;
+  private final MPPaymentGateway mpPaymentGateway;
 
     @Transactional
     public CheckoutResponse createCheckout(CheckoutRequest req, Usr currentUser) throws MPException, MPApiException {
@@ -96,7 +103,8 @@ public class MercadoPagoService {
                     .statementDescriptor("SmartTraffic")
                     .build();
 
-            var pref = new PreferenceClient().create(prefReq);
+            //var pref = new PreferenceClient().create(prefReq);
+            var pref = mpPreferenceGateway.create(prefReq);
 
             // Pre-registrar pago pendiente con vínculo lógico
             Payments pay = new Payments();
@@ -124,8 +132,8 @@ public class MercadoPagoService {
     public boolean confirmFromWebhook(Long paymentId, String externalReference, String mpStatus, String statusDetail)
             throws MPException, MPApiException {
 
-        PaymentClient paymentClient = new PaymentClient();
-        Payment payment = paymentClient.get(paymentId);
+        //PaymentClient paymentClient = new PaymentClient();
+        var payment = mpPaymentGateway.get(paymentId);
 
         String status = payment.getStatus(); // approved / pending / rejected
         String extRef = payment.getExternalReference();
@@ -153,7 +161,7 @@ public class MercadoPagoService {
         return false;
     }
 
-    private void postPaymentSuccess(Services service, Usr usr, Payments pay) {
+    public void postPaymentSuccess(Services service, Usr usr, Payments pay) {
         String mensaje = "";
         String asunto = "";
         Partner partner = partnerRepository.findById(service.getPartner().getId()).get();
