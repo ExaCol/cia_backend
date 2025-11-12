@@ -46,6 +46,13 @@ public class ServicesController {
                     if (s == null) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El usuario no existe");
                     }
+                    boolean ownsVehicle = servicesService.vehicleByUser(email, services.getPlate());
+                    if (!services.getServiceType().equalsIgnoreCase("COURSE")) {
+                        if (!ownsVehicle) {
+                            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                    .body("El vehículo no pertenece al usuario");
+                        }
+                    }
                     return ResponseEntity.status(HttpStatus.CREATED).body("Servicio guardado exitosamente");
                 } catch (Exception e) {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -57,7 +64,6 @@ public class ServicesController {
         } catch (ExpiredJwtException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");
         }
-
     }
 
     @GetMapping("/byUser")
@@ -127,7 +133,8 @@ public class ServicesController {
                 try {
                     Services s = servicesService.deleteEspecificServices(id);
                     if (s == null) {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Servicio no encontrado O ya fue pagado");
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body("Servicio no encontrado O ya fue pagado");
                     }
                     return ResponseEntity.ok("Servicio eliminado exitosamente");
                 } catch (Exception e) {

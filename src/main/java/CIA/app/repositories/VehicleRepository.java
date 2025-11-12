@@ -24,4 +24,6 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Integer> {
              AND v.technoExpiration <= :limitDate)
     """)
     List<Vehicle> findVehiclesExpiringBy(@Param("limitDate") Date limitDate);
+
+    Vehicle findByPlateAndUsrId(String plate, Integer usrId);
 }

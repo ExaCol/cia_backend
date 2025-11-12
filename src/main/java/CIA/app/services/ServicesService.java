@@ -105,4 +105,13 @@ public class ServicesService {
         }
         return false;
     }
+
+    public boolean vehicleByUser(String email, String plate) {
+        Usr user = usrRepository.findByEmail(email);
+        if (user != null) {
+            Vehicle vehicle = vehicleRepository.findByPlateAndUsrId(plate, user.getId());
+            return vehicle != null;
+        }
+        return false;
+    }
 }

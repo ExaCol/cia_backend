@@ -1,4 +1,4 @@
-package CIA.app.controllerTest;
+package CIA.app.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -16,17 +16,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import CIA.app.model.Payments;
 import CIA.app.model.Usr;
 import CIA.app.repositories.PaymentsRepository;
+import CIA.app.repositories.UsrRepository;
 import CIA.app.services.PaymentsService;
 import CIA.app.services.UsrService;
 
 @ExtendWith(MockitoExtension.class)
 public class PaymentsServiceTest {
-/* 
+
     @Mock
     private PaymentsRepository paymentsRepository;
 
     @Mock
     private UsrService usrService;
+
+    @Mock
+    private UsrRepository usrRepository;
 
     @InjectMocks
     private PaymentsService paymentsService;
@@ -42,29 +46,58 @@ public class PaymentsServiceTest {
     private Payments payment(Integer id,LocalDate releaseDate, int amount, String state) {
         Payments p = new Payments();
         p.setId(id);
-        //p.setreleaseDate(releaseDate);
+        p.setReleaseDate(releaseDate);
         p.setState(state);
         p.setAmount(amount);
         return p;
     }
 
     @Test
-    void getPaymentHistoryByUserId_ok() {
-        Integer id = 1;
-        String email = "ana@exa.co";
-        List<Payments> entities = List.of(
-            payment(1 ,LocalDate.of(2025,9,10), 150000, "APPROVED"),
-            payment(2,LocalDate.of(2025,9,1)         ,80000,  "APPROVED")
+    void getSpecificPayments_ok() {
+        Integer paymentId = 1;
+        Payments expectedPayment = payment(paymentId, LocalDate.of(2023, 5, 1), 100000, "COMPLETED");
+
+        when(paymentsRepository.findById(paymentId)).thenReturn(java.util.Optional.of(expectedPayment));
+
+        Payments actualPayment = paymentsService.getSpecificPayments(paymentId);
+
+        assertEquals(expectedPayment, actualPayment);
+        verify(paymentsRepository).findById(paymentId);
+    }
+
+    @Test
+    void paymentHistoryByUsr_ok() {
+        Integer userId = 1;
+        String email = "nico@exa.co";
+        Usr user = usr(userId, email);
+        
+        List<Payments> expectedPayments = List.of(
+                payment(1, LocalDate.of(2023, 5, 1), 100000, "COMPLETED"),
+                payment(2, LocalDate.of(2023, 6, 1), 150000, "PENDING")
         );
-        when(usrService.findByEmail(email)).thenReturn(usr(1, email));
-        when(paymentsRepository.findAllByUserServicesOrderByReleaseDateDesc(id)).thenReturn(entities);
+        user.setPayments(expectedPayments);
 
-        List<Payments> out = paymentsService.getPaymentHistoryByUserId(email);
+        when(usrRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
 
-        assertEquals(2, out.size());
-        assertEquals(1, out.get(0).getId()); 
-        assertEquals("APPROVED", out.get(0).getState());
-        verify(paymentsRepository).findAllByUserServicesOrderByReleaseDateDesc(id);
+
+        List<Payments> actualPayments = paymentsService.paymentHistoryByUsr(userId);
+
+        assertEquals(expectedPayments.size(), actualPayments.size());
+        verify(usrRepository).findById(userId);
+    }
+
+
+    @Test
+    void deleteEspecificPayments_ok() {
+        Integer paymentId = 1;
+        Payments paymentToDelete = payment(paymentId, LocalDate.of(2023, 5, 1), 100000, "COMPLETED");
+
+        when(paymentsRepository.findById(paymentId)).thenReturn(java.util.Optional.of(paymentToDelete));
+
+        Payments deletedPayment = paymentsService.deleteEspecificPayments(paymentToDelete);
+
+        assertEquals(paymentToDelete, deletedPayment);
+        verify(paymentsRepository).delete(paymentToDelete);
     }
 
     @Test
@@ -83,7 +116,7 @@ public class PaymentsServiceTest {
 
     @Test
     void earningsByCat_ok() {
-        String category = "SIMIT";
+        String category = "TICKET";
         Double expectedEarnings = 500000.0;
 
         when(paymentsRepository.earningsByCat(category)).thenReturn(expectedEarnings);
@@ -110,12 +143,12 @@ public class PaymentsServiceTest {
     void savedUsrMoney_ok() {
         Double expectedSavings = 300000.0;
 
-        when(paymentsRepository.savedUsrMoney("SIMIT")).thenReturn(expectedSavings);
+        when(paymentsRepository.savedUsrMoney("TICKET")).thenReturn(expectedSavings);
 
         Double actualSavings = paymentsService.savedUsrMoney();
 
         assertEquals(expectedSavings, actualSavings);
-        verify(paymentsRepository).savedUsrMoney("SIMIT");
+        verify(paymentsRepository).savedUsrMoney("TICKET");
     }
 
     @Test
@@ -129,6 +162,6 @@ public class PaymentsServiceTest {
         assertEquals(expectedGraduates, actualGraduates);
         verify(paymentsRepository).graduatedUsr();
     }
-        */
+        
 }
 

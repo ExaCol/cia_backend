@@ -49,12 +49,11 @@ public class PartnerService {
     }
 
     public Partner deleteSpecificPartner(Integer partnerId) {
-        {
-            Partner p = partnerRepository.findById(partnerId).get();
-            if (p != null) {
-                partnerRepository.delete(p);
-                return p;
-            }
+    
+        Partner p = partnerRepository.findById(partnerId).get();
+        if (p != null) {
+            partnerRepository.delete(p);
+            return p;
         }
         return null;
     }
@@ -69,6 +68,7 @@ public class PartnerService {
                 sPartner.setLat(partner.getLat());
                 sPartner.setSoat(partner.isSoat());
                 sPartner.setTechno(partner.isTechno());
+                sPartner.setService(partner.getService());
                 return partnerRepository.save(sPartner);
             }
         }
